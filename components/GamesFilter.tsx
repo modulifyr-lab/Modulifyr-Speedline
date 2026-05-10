@@ -1,0 +1,83 @@
+'use client'
+
+import { useState } from 'react'
+import { Game, GameStatus, STATUS_LABELS } from '@/lib/games'
+import GameCard from './GameCard'
+
+type Filter = 'all' | GameStatus
+
+const FILTERS: { value: Filter; label: string }[] = [
+  { value: 'all',            label: 'All Games'       },
+  { value: 'available',      label: 'Available Now'   },
+  { value: 'in-development', label: 'In Development'  },
+  { value: 'concept',        label: 'Concept Stage'   },
+  { value: 'coming-soon',    label: 'Coming Soon'     },
+]
+
+interface GamesFilterProps {
+  games: Game[]
+}
+
+export default function GamesFilter({ games }: GamesFilterProps) {
+  const [active, setActive] = useState<Filter>('all')
+
+  const filtered = active === 'all'
+    ? games
+    : games.filter(g => g.status === active)
+
+  // Remove filters that have no matching games
+  const availableFilters = FILTERS.filter(f => {
+    if (f.value === 'all') return true
+    return games.some(g => g.status === f.value)
+  })
+
+  return (
+    <div>
+      {/* Filter bar */}
+      <div className="flex items-center gap-1.5 flex-wrap mb-10">
+        {availableFilters.map(f => (
+          <button
+            key={f.value}
+            onClick={() => setActive(f.value)}
+            className={`
+              font-mono text-[9px] tracking-[0.12em] uppercase px-4 py-2
+              border transition-colors duration-200 cursor-pointer
+              ${active === f.value
+                ? 'bg-sl-orange text-sl-white border-sl-orange'
+                : 'bg-transparent text-sl-muted border-sl-border hover:border-sl-mid hover:text-sl-light'}
+            `}
+          >
+            {f.label}
+            {f.value !== 'all' && (
+              <span className="ml-1.5 opacity-60">
+                ({games.filter(g => g.status === f.value).length})
+              </span>
+            )}
+          </button>
+        ))}
+        <span className="ml-auto font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted">
+          {filtered.length} {filtered.length === 1 ? 'title' : 'titles'}
+        </span>
+      </div>
+
+      {/* Games grid */}
+      {filtered.length > 0 ? (
+        <div className="grid grid-cols-3 gap-0.5">
+          {filtered.map(game => (
+            <GameCard
+              key={game.id}
+              game={game}
+              featured={game.featured && active === 'all'}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="border border-sl-border bg-sl-surface py-20 text-center">
+          <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-sl-muted">
+            No titles in this category yet.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
