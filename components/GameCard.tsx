@@ -16,6 +16,20 @@ const STEAM_ICON = (
   </svg>
 )
 
+// Bell icon as SVG — no emojis in professional/client-facing content (brand rule)
+const BellIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M7 1a4 4 0 0 1 4 4v3l1.5 2H1.5L3 8V5a4 4 0 0 1 4-4Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+    <path d="M5.5 11.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+)
+
+const CheckIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <polyline points="2,7 5.5,10.5 12,3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
 interface GameCardProps {
   game:     Game
   featured?: boolean
@@ -45,8 +59,9 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
       >
         {/* Placeholder art */}
         <div className="absolute inset-0 flex items-center justify-center">
+          {/* Icon placeholder — acceptable as it is cover art placeholder, not UI chrome */}
           <span
-            className="text-sl-border"
+            className="text-sl-border select-none"
             style={{ fontSize: featured ? '72px' : '52px' }}
             aria-hidden="true"
           >
@@ -137,7 +152,7 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
               </a>
             ) : null}
 
-            {/* Notify Me */}
+            {/* Notify — SVG bell, no emoji */}
             {!canBuy && (
               <button
                 onClick={() => setNotified(true)}
@@ -151,7 +166,8 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
                     : 'border-sl-border text-sl-muted hover:border-sl-orange hover:text-sl-orange'}
                 `}
               >
-                {notified ? '✓ On the list' : '🔔 Notify Me'}
+                {notified ? <CheckIcon /> : <BellIcon />}
+                {notified ? 'On the List' : 'Notify Me'}
               </button>
             )}
           </div>

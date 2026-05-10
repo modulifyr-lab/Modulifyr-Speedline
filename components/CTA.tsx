@@ -25,14 +25,14 @@ export default function CTA() {
               className="font-syne font-extrabold text-sl-white leading-none tracking-tight mb-5"
               style={{ fontSize: 'clamp(40px, 6vw, 80px)' }}
             >
-              Have an Idea<br />
+              Have a Game<br />
               Worth{' '}
               <span className="text-sl-orange">Building?</span>
             </h2>
             <p className="text-[16px] text-sl-light max-w-[460px] mx-auto leading-[1.7] mb-9">
-              Speedline is early. We&apos;re building our first titles and open to
-              co-development and licensing partnerships. If you have a game
-              concept that deserves real engineering, talk to us.
+              Speedline is in active development. If you have a licensing inquiry
+              or want to discuss a game concept that requires serious engineering,
+              send a direct message.
             </p>
             <div className="flex items-center justify-center gap-5 flex-wrap">
               <a

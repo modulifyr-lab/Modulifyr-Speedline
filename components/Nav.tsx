@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -35,9 +36,16 @@ export default function Nav() {
           : 'bg-[rgba(8,8,8,0.8)]  backdrop-blur-md'}
       `}
     >
-      {/* Logo */}
+      {/* Logo — actual company PNG; place file at /public/logo.png */}
       <Link href="/" className="flex items-center gap-2.5 no-underline flex-shrink-0">
-        <div className="relative w-[30px] h-[30px] bg-sl-orange clip-nav-mark nav-mark-notch flex-shrink-0" />
+        <Image
+          src="/logo.png"
+          alt="Modulifyr"
+          width={28}
+          height={28}
+          className="flex-shrink-0"
+          priority
+        />
         <div className="font-syne font-bold text-[13px] text-sl-white leading-tight">
           Modulifyr Speedline
           <em className="block not-italic font-mono font-normal text-[9px] text-sl-orange tracking-[0.15em] uppercase">
