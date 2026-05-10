@@ -5,8 +5,8 @@ import { games }       from '@/lib/games'
 import { Timestamp }   from 'firebase-admin/firestore'
 import Stripe          from 'stripe'
 
-// Required for Stripe signature verification — do NOT parse body as JSON
-export const config = { api: { bodyParser: false } }
+export const dynamic = 'force-dynamic'
+export const maxDuration = 30
 
 export async function POST(req: NextRequest) {
   const body      = await req.text()
