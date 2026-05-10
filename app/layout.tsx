@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Syne, DM_Sans, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import SpeedCanvas from '@/components/SpeedCanvas'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 const syne = Syne({
   subsets:  ['latin'],
@@ -43,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="bg-sl-darker text-sl-white font-sans antialiased overflow-x-hidden">
         <SpeedCanvas />
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   )

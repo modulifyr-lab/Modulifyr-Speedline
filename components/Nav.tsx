@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
 
 const NAV_LINKS = [
   { href: '/#games',        label: 'Games'       },
@@ -15,6 +16,8 @@ const NAV_LINKS = [
 
 export default function Nav() {
   const pathname    = usePathname()
+  const router      = useRouter()
+  const { user, loading, signOut } = useAuth()
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -22,6 +25,11 @@ export default function Nav() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  async function handleSignOut() {
+    await signOut()
+    router.push('/')
+  }
 
   return (
     <nav
@@ -58,7 +66,7 @@ export default function Nav() {
       <ul className="hidden md:flex items-center gap-7 list-none">
         {NAV_LINKS.map(link => {
           const isActive = link.href === '/games'
-            ? pathname === '/games'
+            ? pathname.startsWith('/games')
             : pathname === '/'
           return (
             <li key={link.href}>
@@ -77,16 +85,41 @@ export default function Nav() {
             </li>
           )
         })}
-        <li>
-          <Link
-            href="/#cta"
-            className="font-mono text-[10px] tracking-[0.12em] uppercase no-underline
+        
+        {user ? (
+          <>
+            <li>
+              <Link
+                href="/library"
+                className="font-mono text-[10px] tracking-[0.12em] uppercase no-underline
+                           text-sl-cyan hover:text-sl-white transition-colors"
+              >
+                Library
+              </Link>
+            </li>
+            <li>
+              <button
+                onClick={handleSignOut}
+                className="font-mono text-[10px] tracking-[0.12em] uppercase no-underline
+                           border border-sl-border text-sl-light px-4 py-2
+                           transition-colors duration-200 hover:border-sl-mid hover:text-sl-white"
+              >
+                Sign Out
+              </button>
+            </li>
+          </>
+        ) : (
+          <li>
+            <Link
+              href="/auth"
+              className="font-mono text-[10px] tracking-[0.12em] uppercase no-underline
                        bg-sl-orange text-sl-white px-4 py-2 clip-nav-cta
                        transition-colors duration-200 hover:bg-[#c93a28]"
-          >
-            Contact
-          </Link>
-        </li>
+            >
+              Sign In
+            </Link>
+          </li>
+        )}
       </ul>
     </nav>
   )

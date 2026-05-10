@@ -11,9 +11,12 @@
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.59.2",
+    "firebase": "^12.13.0",
+    "firebase-admin": "^13.9.0",
     "next": "^14.2.24",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "stripe": "^22.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",
