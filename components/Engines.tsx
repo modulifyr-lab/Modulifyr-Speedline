@@ -1,11 +1,95 @@
 import Reveal from './Reveal'
 
-// SVG platform/engine marks — brand rule: no emojis in professional content
+// Recognizable geometric SVG marks for each engine
+// Styled to match the brand's grid/block visual language
+
+/** Unity — the iconic diamond/cube shape */
+const UnityIcon = ({ size = 32, active = false }: { size?: number; active?: boolean }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <polygon
+      points="16,2 30,24 2,24"
+      stroke={active ? '#E84530' : '#5A5A5A'}
+      strokeWidth="1.5"
+      fill="none"
+    />
+    <polygon
+      points="16,8 25,22 7,22"
+      stroke={active ? '#E84530' : '#5A5A5A'}
+      strokeWidth="1"
+      fill={active ? 'rgba(232,69,48,0.08)' : 'rgba(90,90,90,0.06)'}
+    />
+    <line x1="16" y1="2" x2="16" y2="8"  stroke={active ? '#E84530' : '#5A5A5A'} strokeWidth="1.5" />
+    <line x1="30" y1="24" x2="25" y2="22" stroke={active ? '#E84530' : '#5A5A5A'} strokeWidth="1.5" />
+    <line x1="2"  y1="24" x2="7"  y2="22" stroke={active ? '#E84530' : '#5A5A5A'} strokeWidth="1.5" />
+  </svg>
+)
+
+/** Unreal Engine — bold arch/horseshoe "U" form */
+const UnrealIcon = ({ size = 32, active = false }: { size?: number; active?: boolean }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path
+      d="M6 4 L6 20 A10 10 0 0 0 26 20 L26 4"
+      stroke={active ? '#E84530' : '#5A5A5A'}
+      strokeWidth="2"
+      fill="none"
+      strokeLinecap="square"
+    />
+    <rect x="3" y="2" width="6" height="4" fill={active ? '#E84530' : '#5A5A5A'} />
+    <rect x="23" y="2" width="6" height="4" fill={active ? '#E84530' : '#5A5A5A'} />
+    <line x1="9" y1="28" x2="23" y2="28" stroke={active ? '#E84530' : '#5A5A5A'} strokeWidth="2" />
+  </svg>
+)
+
+/** Godot — the robot mascot face simplified to a circle with grid eyes */
+const GodotIcon = ({ size = 32, active = false }: { size?: number; active?: boolean }) => {
+  const c = active ? '#E84530' : '#5A5A5A'
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="16" cy="15" r="12" stroke={c} strokeWidth="1.5" fill="none" />
+      {/* Left eye */}
+      <rect x="8"  y="11" width="5" height="5" stroke={c} strokeWidth="1.2" fill="none" />
+      <rect x="9"  y="12" width="3" height="3" fill={c} opacity="0.4" />
+      {/* Right eye */}
+      <rect x="19" y="11" width="5" height="5" stroke={c} strokeWidth="1.2" fill="none" />
+      <rect x="20" y="12" width="3" height="3" fill={c} opacity="0.4" />
+      {/* Mouth line */}
+      <line x1="11" y1="20" x2="21" y2="20" stroke={c} strokeWidth="1.2" strokeLinecap="round" />
+      {/* Ears */}
+      <line x1="4"  y1="15" x2="8"  y2="15" stroke={c} strokeWidth="1.5" />
+      <line x1="24" y1="15" x2="28" y2="15" stroke={c} strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+/** Custom — wrench + gear composite */
+const CustomIcon = ({ size = 32, active = false }: { size?: number; active?: boolean }) => {
+  const c = active ? '#E84530' : '#5A5A5A'
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Gear */}
+      <circle cx="20" cy="12" r="5" stroke={c} strokeWidth="1.2" fill="none" />
+      <circle cx="20" cy="12" r="2" fill={c} opacity="0.35" />
+      {[0, 60, 120, 180, 240, 300].map(deg => {
+        const rad = (deg * Math.PI) / 180
+        const x1  = 20 + 5  * Math.cos(rad)
+        const y1  = 12 + 5  * Math.sin(rad)
+        const x2  = 20 + 7.5 * Math.cos(rad)
+        const y2  = 12 + 7.5 * Math.sin(rad)
+        return <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke={c} strokeWidth="1.5" />
+      })}
+      {/* Wrench handle */}
+      <line x1="4" y1="28" x2="16" y2="16" stroke={c} strokeWidth="2.5" strokeLinecap="round" />
+      <rect x="3" y="24" width="4" height="6" rx="1" transform="rotate(-45 5 27)" fill={c} opacity="0.5" />
+    </svg>
+  )
+}
+
+// Platform icons — same as before
 const WindowsIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect x="1" y="1" width="7.5" height="7.5" fill="#8A8A8A" />
-    <rect x="9.5" y="1" width="7.5" height="7.5" fill="#8A8A8A" />
-    <rect x="1" y="9.5" width="7.5" height="7.5" fill="#8A8A8A" />
+    <rect x="1"   y="1"   width="7.5" height="7.5" fill="#8A8A8A" />
+    <rect x="9.5" y="1"   width="7.5" height="7.5" fill="#8A8A8A" />
+    <rect x="1"   y="9.5" width="7.5" height="7.5" fill="#8A8A8A" />
     <rect x="9.5" y="9.5" width="7.5" height="7.5" fill="#8A8A8A" />
   </svg>
 )
@@ -28,21 +112,11 @@ const LinuxIcon = () => (
   </svg>
 )
 
-// Engine label mark — a simple geometric identifier consistent with the brand grid/block language
-const EngineMark = ({ primary, color }: { primary: boolean; color: string }) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect x="2" y="2" width="9" height="9" stroke={color} strokeWidth={primary ? 1.5 : 1} />
-    <rect x="13" y="2" width="9" height="9" stroke={color} strokeWidth={primary ? 1.5 : 1} />
-    <rect x="2" y="13" width="9" height="9" stroke={color} strokeWidth={primary ? 1.5 : 1} />
-    <rect x="13" y="13" width="9" height="9" stroke={color} strokeWidth={primary ? 1.5 : 1} opacity={primary ? 1 : 0.4} />
-  </svg>
-)
-
 const ENGINES = [
-  { name: 'Unity',         role: 'Primary Engine',         primary: true,  color: '#E84530' },
-  { name: 'Unreal Engine', role: 'High-fidelity projects', primary: false, color: '#5A5A5A' },
-  { name: 'Godot',         role: 'Lightweight / Indie',    primary: false, color: '#5A5A5A' },
-  { name: 'Custom / TBD',  role: 'Project-specific',       primary: false, color: '#5A5A5A' },
+  { name: 'Unity',         role: 'Primary Engine',          Icon: UnityIcon,  primary: true  },
+  { name: 'Unreal Engine', role: 'High-fidelity projects',  Icon: UnrealIcon, primary: false },
+  { name: 'Godot',         role: 'Lightweight / Indie',     Icon: GodotIcon,  primary: false },
+  { name: 'Custom / TBD',  role: 'Project-specific',        Icon: CustomIcon, primary: false },
 ]
 
 const PLATFORMS = [
@@ -74,19 +148,17 @@ export default function Engines() {
               <div
                 key={e.name}
                 className={`
-                  flex flex-col items-center text-center p-7 bg-sl-darker
+                  group flex flex-col items-center text-center p-7 bg-sl-darker
                   border transition-colors duration-200
                   hover:border-sl-orange hover:bg-sl-surface2
                   ${e.primary ? 'border-[rgba(232,69,48,0.35)]' : 'border-sl-border'}
                 `}
               >
-                <div className="mb-2.5">
-                  <EngineMark primary={e.primary} color={e.color} />
+                <div className="mb-3">
+                  <e.Icon size={32} active={e.primary} />
                 </div>
                 <span className="font-syne font-bold text-[14px] text-sl-white mb-1">{e.name}</span>
-                <span
-                  className={`font-mono text-[9px] tracking-[0.1em] uppercase ${e.primary ? 'text-sl-orange' : 'text-sl-muted'}`}
-                >
+                <span className={`font-mono text-[9px] tracking-[0.1em] uppercase ${e.primary ? 'text-sl-orange' : 'text-sl-muted'}`}>
                   {e.role}
                 </span>
                 {e.primary && (
@@ -108,14 +180,10 @@ export default function Engines() {
                 className="flex items-center gap-4 bg-sl-darker border border-sl-border px-6 py-5
                            transition-colors duration-200 hover:border-[rgba(232,69,48,0.2)]"
               >
-                <div className="flex-shrink-0">
-                  <p.Icon />
-                </div>
+                <div className="flex-shrink-0"><p.Icon /></div>
                 <div>
                   <div className="font-syne font-bold text-[14px] text-sl-white">{p.name}</div>
-                  <div className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted mt-0.5">
-                    {p.note}
-                  </div>
+                  <div className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted mt-0.5">{p.note}</div>
                 </div>
               </div>
             ))}
