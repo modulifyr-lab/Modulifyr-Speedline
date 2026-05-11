@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link   from 'next/link'
 import Nav    from '@/components/Nav'
@@ -9,7 +9,7 @@ import { useAuth }         from '@/contexts/AuthContext'
 import { getUserLibrary, LibraryEntry } from '@/lib/purchases'
 import { getGameById }     from '@/lib/games'
 
-export default function LibraryPage() {
+function LibraryContent() {
   const { user, loading, signOut } = useAuth()
   const router       = useRouter()
   const searchParams = useSearchParams()
@@ -147,6 +147,18 @@ export default function LibraryPage() {
 
       <Footer />
     </>
+  )
+}
+
+export default function LibraryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-sl-darker flex items-center justify-center">
+        <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-sl-muted">Loading...</span>
+      </div>
+    }>
+      <LibraryContent />
+    </Suspense>
   )
 }
 
