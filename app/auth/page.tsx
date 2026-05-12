@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link        from 'next/link'
 import Image       from 'next/image'
@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext'
 
 type Mode = 'signin' | 'signup' | 'reset'
 
-export default function AuthPage() {
+function AuthContent() {
   const { user, loading, signIn, signUp, signInGoogle, resetPassword } = useAuth()
   const router       = useRouter()
   const searchParams = useSearchParams()
@@ -21,7 +21,6 @@ export default function AuthPage() {
   const [success,  setSuccess]  = useState('')
   const [busy,     setBusy]     = useState(false)
 
-  // Already signed in — send them where they were going
   useEffect(() => {
     if (!loading && user) router.replace(next)
   }, [user, loading, router, next])
@@ -57,7 +56,6 @@ export default function AuthPage() {
       router.replace(next)
     } catch (err) {
       const msg = parseAuthError(err)
-      // Popup closed by user is not an error worth showing
       if (msg !== '__silent__') setError(msg)
     } finally {
       setBusy(false)
@@ -76,7 +74,6 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-sl-darker flex flex-col">
-      {/* Top bar */}
       <div className="border-b border-sl-border px-12 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 no-underline flex-shrink-0">
           <Image src="/logo.png" alt="Modulifyr" width={24} height={24} />
@@ -89,7 +86,6 @@ export default function AuthPage() {
         </span>
       </div>
 
-      {/* Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="w-full max-w-[400px]">
           <div className="mb-8">
@@ -103,7 +99,6 @@ export default function AuthPage() {
             </h1>
           </div>
 
-          {/* Google sign-in */}
           {mode !== 'reset' && (
             <>
               <button
@@ -126,7 +121,6 @@ export default function AuthPage() {
             </>
           )}
 
-          {/* Errors / success */}
           {error && (
             <div className="mb-4 border border-[rgba(232,69,48,0.3)] bg-[rgba(232,69,48,0.06)] px-4 py-3">
               <p className="font-mono text-[10px] text-sl-orange leading-relaxed">{error}</p>
@@ -138,7 +132,6 @@ export default function AuthPage() {
             </div>
           )}
 
-          {/* Email / password form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div>
               <label className="block font-mono text-[9px] tracking-[0.15em] uppercase text-sl-muted mb-1.5">
@@ -193,7 +186,6 @@ export default function AuthPage() {
             </button>
           </form>
 
-          {/* Mode switchers */}
           <div className="mt-6 flex flex-col gap-2 text-center">
             {mode === 'signin' && (
               <>
@@ -223,6 +215,20 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-sl-darker flex items-center justify-center">
+        <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-sl-muted">
+          Loading...
+        </span>
+      </div>
+    }>
+      <AuthContent />
+    </Suspense>
   )
 }
 
@@ -256,7 +262,7 @@ function parseAuthError(err: unknown): string {
       return 'Invalid email address.'
     case 'auth/popup-closed-by-user':
     case 'auth/cancelled-popup-request':
-      return '__silent__'  // User dismissed the popup — not an error
+      return '__silent__'
     case 'auth/popup-blocked':
       return 'Popup was blocked by your browser. Allow popups for this site and try again.'
     case 'auth/unauthorized-domain':

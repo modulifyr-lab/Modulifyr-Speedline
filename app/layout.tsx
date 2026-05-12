@@ -29,10 +29,21 @@ export const metadata: Metadata = {
   title:       'Modulifyr Speedline — Desktop Game Studio',
   description: 'Engineering-first desktop game development. Buy once, own forever. Available on Steam and direct purchase. A division of Modulifyr.',
   keywords:    ['game studio', 'desktop games', 'steam', 'unity', 'indie games', 'modulifyr', 'buy once own forever'],
+  icons: {
+    icon: '/logo.png',
+  },
   openGraph: {
     title:       'Modulifyr Speedline',
     description: 'Engineering-first desktop game development. Buy once, own forever.',
     type:        'website',
+    images: [
+      {
+        url: '/logo.png',
+        width: 512,
+        height: 512,
+        alt: 'Modulifyr Speedline Logo',
+      },
+    ],
   },
 }
 
