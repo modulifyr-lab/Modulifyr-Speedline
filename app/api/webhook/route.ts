@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe }      from '@/lib/stripe'
-import { getAdminDb }  from '@/lib/firebase-admin'
-import { games }       from '@/lib/games'
-import { Timestamp }   from 'firebase-admin/firestore'
-import Stripe          from 'stripe'
-
-export const dynamic = 'force-dynamic'
-export const maxDuration = 30
+import { stripe }          from '@/lib/stripe'
+import { getServerDb }     from '@/lib/firebase-server'
+import { games }           from '@/lib/games'
+import { doc, setDoc, Timestamp } from 'firebase/firestore'
+import Stripe              from 'stripe'
 
 export async function POST(req: NextRequest) {
   const body      = await req.text()
@@ -42,14 +39,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing metadata.' }, { status: 400 })
     }
 
-    const db = getAdminDb()
-
-    // Resolve download URL from game data (if available)
-    let downloadUrl: string | null = null
+    let downloadUrl: string | null  = null
     let parentGameId: string | undefined
 
     if (itemType === 'game') {
-      const game = games.find(g => g.id === itemId)
+      const game  = games.find(g => g.id === itemId)
       downloadUrl = game?.downloadUrl ?? null
     } else {
       for (const game of games) {
@@ -72,15 +66,15 @@ export async function POST(req: NextRequest) {
       ...(parentGameId ? { parentGameId } : {}),
     }
 
-    // Write to Firestore: users/{uid}/library/{itemId}
-    await db
-      .collection('users')
-      .doc(uid)
-      .collection('library')
-      .doc(itemId)
-      .set(libraryEntry)
-
-    console.log(`[webhook] Purchase recorded: ${uid} → ${itemId}`)
+    try {
+      const db      = await getServerDb()
+      const itemRef = doc(db, 'users', uid, 'library', itemId)
+      await setDoc(itemRef, libraryEntry)
+      console.log(`[webhook] Purchase recorded: ${uid} -> ${itemId}`)
+    } catch (err) {
+      console.error('[webhook] Firestore write failed:', err)
+      return NextResponse.json({ error: 'Database write failed.' }, { status: 500 })
+    }
   }
 
   return NextResponse.json({ received: true })
