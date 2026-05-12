@@ -1,26 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server'
+// Route protection is handled client-side in app/library/page.tsx via useAuth().
+// Firebase Auth restores from IndexedDB asynchronously on the client — any
+// server-side cookie check runs before that restoration completes, causing
+// authenticated users to get redirected to /auth on every page load.
+//
+// The library page already does:
+//   if (!loading && !user) router.replace('/auth?next=/library')
+//
+// That is sufficient. This middleware file is kept as a placeholder for
+// future server-side needs (e.g. redirecting logged-in users away from /auth).
 
-// This middleware runs on the edge — it can't use Firebase Admin SDK.
-// We use a lightweight cookie check: Firebase Auth sets a cookie named
-// 'firebase-auth-token' which we write client-side after sign-in (see AuthContext).
-// For a more secure setup, use Firebase session cookies with the Admin SDK.
+import { NextRequest, NextResponse } from 'next/server'
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  // Only guard the library route
-  if (pathname.startsWith('/library')) {
-    const token = req.cookies.get('speedline-auth')?.value
-    if (!token) {
-      const loginUrl = new URL('/auth', req.url)
-      loginUrl.searchParams.set('next', pathname)
-      return NextResponse.redirect(loginUrl)
-    }
+  // If already signed in (cookie present) and trying to access /auth,
+  // redirect to library instead of showing the login page again.
+  const hasAuth = req.cookies.get('speedline-auth')?.value
+  if (pathname.startsWith('/auth') && hasAuth) {
+    return NextResponse.redirect(new URL('/library', req.url))
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/library/:path*'],
+  matcher: ['/auth/:path*'],
 }

@@ -1,47 +1,49 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter }  from 'next/navigation'
-import Link           from 'next/link'
-import { useAuth }    from '@/contexts/AuthContext'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Link        from 'next/link'
+import Image       from 'next/image'
+import { useAuth } from '@/contexts/AuthContext'
 
 type Mode = 'signin' | 'signup' | 'reset'
 
 export default function AuthPage() {
   const { user, loading, signIn, signUp, signInGoogle, resetPassword } = useAuth()
-  const router = useRouter()
+  const router       = useRouter()
+  const searchParams = useSearchParams()
+  const next         = searchParams.get('next') ?? '/library'
 
-  const [mode,      setMode]      = useState<Mode>('signin')
-  const [email,     setEmail]     = useState('')
-  const [password,  setPassword]  = useState('')
-  const [error,     setError]     = useState('')
-  const [success,   setSuccess]   = useState('')
-  const [busy,      setBusy]      = useState(false)
+  const [mode,     setMode]     = useState<Mode>('signin')
+  const [email,    setEmail]    = useState('')
+  const [password, setPassword] = useState('')
+  const [error,    setError]    = useState('')
+  const [success,  setSuccess]  = useState('')
+  const [busy,     setBusy]     = useState(false)
 
-  // Redirect if already signed in
+  // Already signed in — send them where they were going
   useEffect(() => {
-    if (!loading && user) router.replace('/library')
-  }, [user, loading, router])
+    if (!loading && user) router.replace(next)
+  }, [user, loading, router, next])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
     setSuccess('')
     setBusy(true)
-
     try {
       if (mode === 'reset') {
         await resetPassword(email)
-        setSuccess('Password reset email sent. Check your inbox.')
+        setSuccess('Reset email sent. Check your inbox.')
       } else if (mode === 'signup') {
         await signUp(email, password)
-        router.replace('/library')
+        router.replace(next)
       } else {
         await signIn(email, password)
-        router.replace('/library')
+        router.replace(next)
       }
-    } catch (err: unknown) {
-      setError(parseFirebaseError(err))
+    } catch (err) {
+      setError(parseAuthError(err))
     } finally {
       setBusy(false)
     }
@@ -52,9 +54,11 @@ export default function AuthPage() {
     setBusy(true)
     try {
       await signInGoogle()
-      router.replace('/library')
-    } catch (err: unknown) {
-      setError(parseFirebaseError(err))
+      router.replace(next)
+    } catch (err) {
+      const msg = parseAuthError(err)
+      // Popup closed by user is not an error worth showing
+      if (msg !== '__silent__') setError(msg)
     } finally {
       setBusy(false)
     }
@@ -74,8 +78,11 @@ export default function AuthPage() {
     <div className="min-h-screen bg-sl-darker flex flex-col">
       {/* Top bar */}
       <div className="border-b border-sl-border px-12 h-16 flex items-center justify-between">
-        <Link href="/" className="font-syne font-bold text-[13px] text-sl-white no-underline">
-          Modulifyr Speedline
+        <Link href="/" className="flex items-center gap-2.5 no-underline flex-shrink-0">
+          <Image src="/logo.png" alt="Modulifyr" width={24} height={24} />
+          <span className="font-syne font-bold text-[13px] text-sl-white">
+            Modulifyr Speedline
+          </span>
         </Link>
         <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-sl-muted">
           {mode === 'signin' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Reset Password'}
@@ -85,21 +92,18 @@ export default function AuthPage() {
       {/* Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="w-full max-w-[400px]">
-          {/* Header */}
           <div className="mb-8">
             <span className="block font-mono text-[10px] tracking-[0.2em] uppercase text-sl-orange mb-2">
               {mode === 'signin' ? 'Welcome Back' : mode === 'signup' ? 'New Account' : 'Reset Password'}
             </span>
             <h1 className="font-syne font-extrabold text-[28px] text-sl-white leading-tight">
-              {mode === 'signin'
-                ? 'Sign in to access your library.'
-                : mode === 'signup'
-                ? 'Create an account to start buying.'
-                : 'Enter your email to reset.'}
+              {mode === 'signin'   ? 'Sign in to access your library.'
+               : mode === 'signup' ? 'Create an account to start buying.'
+               :                    'Enter your email to reset.'}
             </h1>
           </div>
 
-          {/* Google sign in — only for signin/signup */}
+          {/* Google sign-in */}
           {mode !== 'reset' && (
             <>
               <button
@@ -114,7 +118,6 @@ export default function AuthPage() {
                 <GoogleIcon />
                 Continue with Google
               </button>
-
               <div className="flex items-center gap-3 mb-5">
                 <div className="flex-1 h-px bg-sl-border" />
                 <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted">or</span>
@@ -123,11 +126,19 @@ export default function AuthPage() {
             </>
           )}
 
-          {/* Error / success */}
-          {error   && <p className="font-mono text-[10px] text-sl-orange mb-4 leading-relaxed">{error}</p>}
-          {success && <p className="font-mono text-[10px] text-sl-cyan  mb-4 leading-relaxed">{success}</p>}
+          {/* Errors / success */}
+          {error && (
+            <div className="mb-4 border border-[rgba(232,69,48,0.3)] bg-[rgba(232,69,48,0.06)] px-4 py-3">
+              <p className="font-mono text-[10px] text-sl-orange leading-relaxed">{error}</p>
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 border border-[rgba(47,184,200,0.3)] bg-[rgba(47,184,200,0.06)] px-4 py-3">
+              <p className="font-mono text-[10px] text-sl-cyan leading-relaxed">{success}</p>
+            </div>
+          )}
 
-          {/* Form */}
+          {/* Email / password form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div>
               <label className="block font-mono text-[9px] tracking-[0.15em] uppercase text-sl-muted mb-1.5">
@@ -176,7 +187,9 @@ export default function AuthPage() {
             >
               {busy
                 ? 'Processing...'
-                : mode === 'signin' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Send Reset Email'}
+                : mode === 'signin'  ? 'Sign In'
+                : mode === 'signup'  ? 'Create Account'
+                :                     'Send Reset Email'}
             </button>
           </form>
 
@@ -184,19 +197,25 @@ export default function AuthPage() {
           <div className="mt-6 flex flex-col gap-2 text-center">
             {mode === 'signin' && (
               <>
-                <button onClick={() => { setMode('signup'); setError('') }}
-                  className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted hover:text-sl-white transition-colors">
+                <button
+                  onClick={() => { setMode('signup'); setError('') }}
+                  className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted hover:text-sl-white transition-colors"
+                >
                   No account? Create one
                 </button>
-                <button onClick={() => { setMode('reset'); setError('') }}
-                  className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted hover:text-sl-white transition-colors">
+                <button
+                  onClick={() => { setMode('reset'); setError('') }}
+                  className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted hover:text-sl-white transition-colors"
+                >
                   Forgot password?
                 </button>
               </>
             )}
             {(mode === 'signup' || mode === 'reset') && (
-              <button onClick={() => { setMode('signin'); setError('') }}
-                className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted hover:text-sl-white transition-colors">
+              <button
+                onClick={() => { setMode('signin'); setError('') }}
+                className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted hover:text-sl-white transition-colors"
+              >
                 Back to sign in
               </button>
             )}
@@ -209,7 +228,7 @@ export default function AuthPage() {
 
 function GoogleIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -218,24 +237,35 @@ function GoogleIcon() {
   )
 }
 
-function parseFirebaseError(err: unknown): string {
-  if (typeof err === 'object' && err !== null && 'code' in err) {
-    switch ((err as { code: string }).code) {
-      case 'auth/user-not-found':
-      case 'auth/wrong-password':
-      case 'auth/invalid-credential':
-        return 'Incorrect email or password.'
-      case 'auth/email-already-in-use':
-        return 'This email is already registered. Sign in instead.'
-      case 'auth/weak-password':
-        return 'Password must be at least 8 characters.'
-      case 'auth/too-many-requests':
-        return 'Too many attempts. Try again later.'
-      case 'auth/invalid-email':
-        return 'Invalid email address.'
-      default:
-        return 'An error occurred. Please try again.'
-    }
+function parseAuthError(err: unknown): string {
+  if (typeof err !== 'object' || err === null || !('code' in err)) {
+    return 'An error occurred. Please try again.'
   }
-  return 'An error occurred. Please try again.'
+  switch ((err as { code: string }).code) {
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential':
+      return 'Incorrect email or password.'
+    case 'auth/email-already-in-use':
+      return 'This email is already registered. Sign in instead.'
+    case 'auth/weak-password':
+      return 'Password must be at least 8 characters.'
+    case 'auth/too-many-requests':
+      return 'Too many failed attempts. Try again in a few minutes.'
+    case 'auth/invalid-email':
+      return 'Invalid email address.'
+    case 'auth/popup-closed-by-user':
+    case 'auth/cancelled-popup-request':
+      return '__silent__'  // User dismissed the popup — not an error
+    case 'auth/popup-blocked':
+      return 'Popup was blocked by your browser. Allow popups for this site and try again.'
+    case 'auth/unauthorized-domain':
+      return 'This domain is not authorised for Google sign-in. Add it in Firebase Console → Authentication → Settings → Authorised domains.'
+    case 'auth/network-request-failed':
+      return 'Network error. Check your connection and try again.'
+    case 'auth/user-disabled':
+      return 'This account has been disabled.'
+    default:
+      return `Sign-in failed (${(err as { code: string }).code}). Please try again.`
+  }
 }
