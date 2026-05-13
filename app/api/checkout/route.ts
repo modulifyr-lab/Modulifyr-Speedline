@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
-import { games }  from '@/lib/games'
+import { games } from '@/lib/games'
+import { LEMON_SQUEEZY_API_KEY, LEMON_SQUEEZY_STORE_ID, LEMON_SQUEEZY_BASE_URL } from '@/lib/lemonsqueezy'
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,53 +15,90 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 })
     }
 
-    // Resolve the Stripe price ID from game data
-    let stripePriceId: string | null = null
+    let lemonSqueezyVariantId: string | null = null
     let itemTitle = ''
 
     if (itemType === 'game') {
       const game = games.find(g => g.id === itemId)
       if (!game) return NextResponse.json({ error: 'Game not found.' }, { status: 404 })
-      if (!game.stripePriceId) return NextResponse.json({ error: 'Game not available for purchase yet.' }, { status: 400 })
-      stripePriceId = game.stripePriceId
-      itemTitle     = game.title
+      if (!game.lemonSqueezyVariantId) return NextResponse.json({ error: 'Game not available for purchase yet.' }, { status: 400 })
+      lemonSqueezyVariantId = game.lemonSqueezyVariantId
+      itemTitle = game.title
     } else {
-      // DLC — find the parent game, then the DLC within it
       for (const game of games) {
         const dlc = game.dlcs?.find(d => d.id === itemId)
         if (dlc) {
-          stripePriceId = dlc.stripePriceId
-          itemTitle     = dlc.title
+          lemonSqueezyVariantId = dlc.lemonSqueezyVariantId
+          itemTitle = dlc.title
           break
         }
       }
-      if (!stripePriceId) return NextResponse.json({ error: 'DLC not found.' }, { status: 404 })
+      if (!lemonSqueezyVariantId) return NextResponse.json({ error: 'DLC not found.' }, { status: 404 })
     }
 
-    const session = await stripe.checkout.sessions.create({
-      mode:                'payment',
-      payment_method_types: ['card'],
-      customer_email:      userEmail,
-      line_items: [
-        {
-          price:    stripePriceId,
-          quantity: 1,
-        },
-      ],
-      // Pass context so the webhook knows who bought what
-      metadata: {
-        uid,
-        itemId,
-        itemType,
-        itemTitle,
+    const checkoutUrl = `${LEMON_SQUEEZY_BASE_URL}/checkouts`
+    const response = await fetch(checkoutUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/vnd.api+json',
+        'Content-Type': 'application/vnd.api+json',
+        'Authorization': `Bearer ${LEMON_SQUEEZY_API_KEY}`
       },
-      // client_reference_id is the Firebase UID — used as fallback in webhook
-      client_reference_id: uid,
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/library?success=1&item=${itemId}`,
-      cancel_url:  `${process.env.NEXT_PUBLIC_BASE_URL}/games/${itemType === 'game' ? itemId : ''}`,
+      body: JSON.stringify({
+        data: {
+          type: 'checkouts',
+          attributes: {
+            store_id: parseInt(LEMON_SQUEEZY_STORE_ID),
+            custom_price: null,
+            product_options: {
+              enabled_variants: [parseInt(lemonSqueezyVariantId)],
+              redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL}/library?success=1&item=${itemId}`,
+              receipt_button_text: 'Return to Modulifyr Speedline',
+              receipt_link_url: `${process.env.NEXT_PUBLIC_BASE_URL}/library?success=1&item=${itemId}`,
+            },
+            checkout_options: {
+              embed: false,
+              media: true,
+              logo: true,
+            },
+            checkout_data: {
+              email: userEmail,
+              custom: {
+                uid,
+                itemId,
+                itemType,
+                itemTitle,
+              }
+            }
+          },
+          relationships: {
+            store: {
+              data: {
+                type: 'stores',
+                id: LEMON_SQUEEZY_STORE_ID
+              }
+            },
+            variant: {
+              data: {
+                type: 'variants',
+                id: lemonSqueezyVariantId
+              }
+            }
+          }
+        }
+      })
     })
 
-    return NextResponse.json({ url: session.url })
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('[checkout] Lemon Squeezy error:', response.status, errorText)
+      return NextResponse.json({ error: 'Failed to create checkout session.' }, { status: 500 })
+    }
+
+    const data = await response.json()
+    const checkoutUrlRedirect = data.data.attributes.url
+
+    return NextResponse.json({ url: checkoutUrlRedirect })
   } catch (err) {
     console.error('[checkout] Error:', err)
     return NextResponse.json({ error: 'Failed to create checkout session.' }, { status: 500 })

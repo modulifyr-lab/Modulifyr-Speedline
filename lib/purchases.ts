@@ -8,13 +8,13 @@ import {
 import { db } from './firebase'
 
 export interface LibraryEntry {
-  gameId:      string
-  title:       string
-  purchasedAt: Timestamp
-  downloadUrl: string | null
-  stripeSessionId: string
-  type:        'game' | 'dlc'
-  parentGameId?: string  // set for DLC entries
+  gameId:              string
+  title:               string
+  purchasedAt:         Timestamp
+  downloadUrl:         string | null
+  lemonSqueezyOrderId: string
+  type:                'game' | 'dlc'
+  parentGameId?:       string  // set for DLC entries
 }
 
 /** Fetch all library entries for a user (client-side) */
