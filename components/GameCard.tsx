@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState }  from 'react'
+import Link          from 'next/link'
 import { Game, GameStatus, PLATFORM_LABELS, STATUS_LABELS } from '@/lib/games'
 
 const STATUS_BADGE: Record<GameStatus, string> = {
@@ -16,30 +17,29 @@ const STEAM_ICON = (
   </svg>
 )
 
-// Bell icon as SVG — no emojis in professional/client-facing content (brand rule)
 const BellIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg width="10" height="10" viewBox="0 0 14 14" fill="none" aria-hidden="true">
     <path d="M7 1a4 4 0 0 1 4 4v3l1.5 2H1.5L3 8V5a4 4 0 0 1 4-4Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
     <path d="M5.5 11.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
   </svg>
 )
 
 const CheckIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg width="10" height="10" viewBox="0 0 14 14" fill="none" aria-hidden="true">
     <polyline points="2,7 5.5,10.5 12,3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
 
 interface GameCardProps {
-  game:     Game
+  game:      Game
   featured?: boolean
 }
 
 export default function GameCard({ game, featured = false }: GameCardProps) {
   const [notified, setNotified] = useState(false)
 
-  const canBuy    = game.status === 'available' && game.directUrl
-  const canSteam  = game.steamUrl !== null
+  const canBuy   = game.status === 'available' && game.directUrl
+  const canSteam = game.steamUrl !== null
   const showPrice = game.status === 'available' && game.price !== null
 
   return (
@@ -49,69 +49,75 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
         bg-sl-surface border border-sl-border
         transition-colors duration-250
         hover:border-[rgba(232,69,48,0.5)]
-        ${featured ? 'col-span-2' : ''}
+        ${featured ? 'col-span-1 sm:col-span-2' : ''}
       `}
     >
-      {/* Art area */}
-      <div
-        className={`relative w-full flex-shrink-0 overflow-hidden ${featured ? 'aspect-[16/7]' : 'aspect-video'}`}
-        style={{ background: game.artGradient }}
+      {/* Art area — clicking this navigates to the detail page */}
+      <Link
+        href={`/games/${game.id}`}
+        className="block no-underline"
+        aria-label={`View details for ${game.title}`}
       >
-        {/* Placeholder art */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          {/* Icon placeholder — acceptable as it is cover art placeholder, not UI chrome */}
-          <span
-            className="text-sl-border select-none"
-            style={{ fontSize: featured ? '72px' : '52px' }}
-            aria-hidden="true"
-          >
-            {game.icon}
-          </span>
-          <span className="absolute bottom-3 right-3.5 font-mono text-[9px] tracking-[0.15em] uppercase text-sl-border select-none">
-            Cover Art
-          </span>
-        </div>
-
-        {/* Status badge */}
-        <span
-          className={`absolute top-3 left-3 font-mono text-[9px] tracking-[0.12em] uppercase px-2 py-1 ${STATUS_BADGE[game.status]}`}
+        <div
+          className={`relative w-full flex-shrink-0 overflow-hidden ${featured ? 'aspect-[16/7]' : 'aspect-video'}`}
+          style={{ background: game.artGradient }}
         >
-          {STATUS_LABELS[game.status]}
-        </span>
-
-        {/* Platform badges */}
-        <div className="absolute top-3 right-3 flex gap-1">
-          {game.platforms.map(p => (
+          <div className="absolute inset-0 flex items-center justify-center">
             <span
-              key={p}
-              className="font-mono text-[9px] tracking-[0.08em] uppercase
-                         text-sl-mid border border-sl-border px-2 py-0.5
-                         bg-[rgba(8,8,8,0.7)] backdrop-blur-sm"
+              className="text-sl-border select-none"
+              style={{ fontSize: featured ? '72px' : '52px' }}
+              aria-hidden="true"
             >
-              {PLATFORM_LABELS[p]}
+              {game.icon}
             </span>
-          ))}
+            <span className="absolute bottom-3 right-3.5 font-mono text-[9px] tracking-[0.15em] uppercase text-sl-border select-none">
+              Cover Art
+            </span>
+          </div>
+
+          {/* Status badge */}
+          <span className={`absolute top-3 left-3 font-mono text-[9px] tracking-[0.12em] uppercase px-2 py-1 ${STATUS_BADGE[game.status]}`}>
+            {STATUS_LABELS[game.status]}
+          </span>
+
+          {/* Platform badges */}
+          <div className="absolute top-3 right-3 flex gap-1 flex-wrap justify-end">
+            {game.platforms.map(p => (
+              <span
+                key={p}
+                className="font-mono text-[9px] tracking-[0.08em] uppercase
+                           text-sl-mid border border-sl-border px-2 py-0.5
+                           bg-[rgba(8,8,8,0.7)] backdrop-blur-sm"
+              >
+                {PLATFORM_LABELS[p]}
+              </span>
+            ))}
+          </div>
+
+          {/* Hover overlay hint */}
+          <div className="absolute inset-0 bg-[rgba(232,69,48,0.04)] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
         </div>
-      </div>
+      </Link>
 
       {/* Body */}
-      <div className={`flex flex-col flex-1 ${featured ? 'p-7' : 'p-6'}`}>
+      <div className={`flex flex-col flex-1 ${featured ? 'p-5 sm:p-7' : 'p-4 sm:p-6'}`}>
         <p className="font-mono text-[9px] tracking-[0.15em] uppercase text-sl-orange mb-1.5">
           {game.genre} · {game.engine}
         </p>
-        <h3
-          className={`font-syne font-bold text-sl-white leading-tight mb-2 ${featured ? 'text-2xl' : 'text-lg'}`}
-        >
-          {game.title}
-        </h3>
+
+        {/* Title links to detail page */}
+        <Link href={`/games/${game.id}`} className="no-underline group/title">
+          <h3 className={`font-syne font-bold text-sl-white leading-tight mb-2 group-hover/title:text-sl-orange transition-colors duration-200 ${featured ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'}`}>
+            {game.title}
+          </h3>
+        </Link>
+
         <p className="text-[13px] text-sl-muted leading-relaxed flex-1 mb-5">
           {game.description}
         </p>
 
         {/* Footer: price + actions */}
         <div className="flex items-center justify-between flex-wrap gap-2.5 pt-4 border-t border-sl-border">
-
-          {/* Price */}
           {showPrice ? (
             <span className="font-syne font-bold text-[18px] text-sl-white">
               ${game.price?.toFixed(2)}
@@ -122,23 +128,19 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
             </span>
           )}
 
-          {/* Action buttons */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            {/* Buy direct */}
             {canBuy && (
               <a
                 href={game.directUrl!}
                 className="inline-flex items-center gap-1.5 bg-sl-orange text-sl-white
                            px-3.5 py-2 font-mono text-[9px] tracking-[0.1em] uppercase
-                           no-underline clip-btn-sm transition-colors duration-200
-                           hover:bg-[#c93a28]"
+                           no-underline clip-btn-sm transition-colors duration-200 hover:bg-[#c93a28]"
               >
                 Buy Direct
               </a>
             )}
 
-            {/* Steam */}
-            {canSteam ? (
+            {canSteam && (
               <a
                 href={game.steamUrl!}
                 target="_blank"
@@ -150,9 +152,8 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
                 {STEAM_ICON}
                 {game.status === 'available' ? 'Buy on Steam' : 'Wishlist'}
               </a>
-            ) : null}
+            )}
 
-            {/* Notify — SVG bell, no emoji */}
             {!canBuy && (
               <button
                 onClick={() => setNotified(true)}

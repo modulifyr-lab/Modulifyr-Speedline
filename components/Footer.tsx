@@ -14,33 +14,37 @@ const FOOTER_COLS = [
   {
     heading: 'Buy',
     links: [
-      { label: 'Steam Store',      href: '#'      },
-      { label: 'Direct Purchase',  href: '/games' },
-      { label: 'Press Kit',        href: '#'      },
+      { label: 'Steam Store',     href: '#'      },
+      { label: 'Direct Purchase', href: '/games' },
+      { label: 'Press Kit',       href: '#'      },
+    ],
+  },
+  {
+    heading: 'Legal',
+    links: [
+      { label: 'Terms of Service', href: '/legal/terms'   },
+      { label: 'Privacy Policy',   href: '/legal/privacy' },
+      { label: 'Refund Policy',    href: '/legal/refund'  },
     ],
   },
   {
     heading: 'Company',
     links: [
       { label: 'Modulifyr HQ',      href: 'https://modulifyr.vercel.app', external: true },
-      { label: 'Modulifyr Virtual', href: '#' },
-      { label: 'Contact',           href: 'mailto:hello@modulifyr.com' },
+      { label: 'Contact',           href: 'modulifyr.com'   },
     ],
   },
 ]
 
 export default function Footer() {
   return (
-    <footer className="relative z-10 bg-sl-surface border-t border-sl-border px-12 pt-14 pb-9">
+    <footer className="relative z-10 bg-sl-surface border-t border-sl-border px-5 sm:px-8 md:px-12 pt-12 sm:pt-14 pb-8 sm:pb-9">
       <div className="max-w-[1120px] mx-auto">
 
         {/* Top grid */}
-        <div
-          className="grid gap-12 pb-11 mb-7 border-b border-sl-border"
-          style={{ gridTemplateColumns: '1.6fr 1fr 1fr 1fr' }}
-        >
-          {/* Brand */}
-          <div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-[1.6fr_1fr_1fr_1fr] gap-8 sm:gap-10 md:gap-12 pb-10 sm:pb-11 mb-7 border-b border-sl-border">
+          {/* Brand — full width on smallest screens */}
+          <div className="col-span-2 sm:col-span-3 md:col-span-1">
             <div className="font-syne font-extrabold text-[17px] text-sl-white mb-1">
               Modulifyr Speedline
             </div>
@@ -48,8 +52,7 @@ export default function Footer() {
               Desktop Game Studio Division
             </div>
             <p className="text-[13px] text-sl-muted leading-relaxed max-w-[270px]">
-              Engineering-first desktop game development. Modular, maintainable,
-              built to last. Available on Steam and direct purchase.
+              Engineering-first desktop game development. Buy once, own forever. Available on Steam and direct purchase.
             </p>
           </div>
 
@@ -77,18 +80,13 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex items-center justify-between flex-wrap gap-2.5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted">
             © {new Date().getFullYear()} Modulifyr Speedline. All rights reserved.
           </span>
           <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted">
             A division of{' '}
-            <Link
-              href="https://modulifyr.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sl-orange no-underline hover:underline"
-            >
+            <Link href="https://modulifyr.vercel.app" target="_blank" rel="noopener noreferrer" className="text-sl-orange no-underline hover:underline">
               Modulifyr
             </Link>
             {' '}· Sole Proprietor: Rijan

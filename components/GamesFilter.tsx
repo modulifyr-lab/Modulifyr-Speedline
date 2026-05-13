@@ -1,17 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState }  from 'react'
 import { Game, GameStatus, STATUS_LABELS } from '@/lib/games'
-import GameCard from './GameCard'
+import GameCard       from './GameCard'
 
 type Filter = 'all' | GameStatus
 
 const FILTERS: { value: Filter; label: string }[] = [
-  { value: 'all',            label: 'All Games'       },
-  { value: 'available',      label: 'Available Now'   },
-  { value: 'in-development', label: 'In Development'  },
-  { value: 'concept',        label: 'Concept Stage'   },
-  { value: 'coming-soon',    label: 'Coming Soon'     },
+  { value: 'all',            label: 'All'          },
+  { value: 'available',      label: 'Available'    },
+  { value: 'in-development', label: 'In Dev'       },
+  { value: 'concept',        label: 'Concept'      },
+  { value: 'coming-soon',    label: 'Coming Soon'  },
 ]
 
 interface GamesFilterProps {
@@ -21,11 +21,8 @@ interface GamesFilterProps {
 export default function GamesFilter({ games }: GamesFilterProps) {
   const [active, setActive] = useState<Filter>('all')
 
-  const filtered = active === 'all'
-    ? games
-    : games.filter(g => g.status === active)
+  const filtered = active === 'all' ? games : games.filter(g => g.status === active)
 
-  // Remove filters that have no matching games
   const availableFilters = FILTERS.filter(f => {
     if (f.value === 'all') return true
     return games.some(g => g.status === f.value)
@@ -34,13 +31,13 @@ export default function GamesFilter({ games }: GamesFilterProps) {
   return (
     <div>
       {/* Filter bar */}
-      <div className="flex items-center gap-1.5 flex-wrap mb-10">
+      <div className="flex items-center gap-1.5 flex-wrap mb-8 sm:mb-10">
         {availableFilters.map(f => (
           <button
             key={f.value}
             onClick={() => setActive(f.value)}
             className={`
-              font-mono text-[9px] tracking-[0.12em] uppercase px-4 py-2
+              font-mono text-[9px] tracking-[0.12em] uppercase px-3 sm:px-4 py-2
               border transition-colors duration-200 cursor-pointer
               ${active === f.value
                 ? 'bg-sl-orange text-sl-white border-sl-orange'
@@ -49,9 +46,7 @@ export default function GamesFilter({ games }: GamesFilterProps) {
           >
             {f.label}
             {f.value !== 'all' && (
-              <span className="ml-1.5 opacity-60">
-                ({games.filter(g => g.status === f.value).length})
-              </span>
+              <span className="ml-1.5 opacity-60">({games.filter(g => g.status === f.value).length})</span>
             )}
           </button>
         ))}
@@ -62,7 +57,7 @@ export default function GamesFilter({ games }: GamesFilterProps) {
 
       {/* Games grid */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-3 gap-0.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-0.5">
           {filtered.map(game => (
             <GameCard
               key={game.id}
