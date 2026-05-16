@@ -1,85 +1,86 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter }   from 'next/navigation'
-import { useAuth }     from '@/contexts/AuthContext'
-import { userOwnsItem } from '@/lib/purchases'
+import { useRouter }           from 'next/navigation'
+import { useAuth }             from '@/contexts/AuthContext'
+import { useCart }             from '@/contexts/CartContext'
+import { userOwnsItem }        from '@/lib/purchases'
+import type { Game, DLC }      from '@/lib/games'
 
 interface BuyButtonProps {
-  itemId:       string
-  itemType:     'game' | 'dlc'
-  price:        number | null
-  title:        string
-  downloadUrl?: string | null
-  /** For DLC — the parent game must be owned first */
-  requiresGameId?: string
-  parentOwned?:    boolean
-  featured?:       boolean
+  item:          Game | DLC
+  itemType:      'game' | 'dlc'
+  artGradient?:  string
+  /** Show both "Add to Cart" and "Buy Now" (used on detail pages) */
+  showBothActions?: boolean
+  parentOwned?:  boolean
 }
 
 export default function BuyButton({
-  itemId,
+  item,
   itemType,
-  price,
-  title,
-  downloadUrl,
-  requiresGameId,
-  parentOwned = true,
-  featured = false,
+  artGradient  = '#141414',
+  showBothActions = false,
+  parentOwned  = true,
 }: BuyButtonProps) {
-  const { user } = useAuth()
-  const router   = useRouter()
+  const { user }   = useAuth()
+  const { addItem, hasItem } = useCart()
+  const router     = useRouter()
 
   const [owned,    setOwned]    = useState(false)
   const [checking, setChecking] = useState(true)
   const [busy,     setBusy]     = useState(false)
   const [error,    setError]    = useState('')
 
+  const inCart = hasItem(item.id)
+
   useEffect(() => {
     if (!user) { setChecking(false); return }
-    userOwnsItem(user.uid, itemId)
-      .then(result => setOwned(result))
+    userOwnsItem(user.uid, item.id)
+      .then(r => setOwned(r))
       .finally(() => setChecking(false))
-  }, [user, itemId])
+  }, [user, item.id])
 
-  async function handleBuy() {
+  // ── Add to cart ──────────────────────────────────────────────────────────
+  function handleAddToCart() {
     if (!user) {
-      router.push(`/auth?next=/games/${itemId}`)
+      router.push(`/auth?next=/games/${item.id}`)
       return
     }
+    if (!item.price || !('stripePriceId' in item) || !item.stripePriceId) return
+    addItem({
+      id:            item.id,
+      type:          itemType,
+      title:         item.title,
+      price:         item.price,
+      stripePriceId: item.stripePriceId,
+      icon:          'icon' in item ? item.icon : '🎮',
+      artGradient,
+    })
+  }
 
-    if (!parentOwned) {
-      setError(`You must own the base game before purchasing this DLC.`)
+  // ── Buy now (direct Stripe checkout, skips cart) ─────────────────────────
+  async function handleBuyNow() {
+    if (!user) {
+      router.push(`/auth?next=/games/${item.id}`)
       return
     }
-
-    if (!price) {
-      setError('This item is not yet available for purchase.')
-      return
-    }
+    if (!item.price || !('stripePriceId' in item) || !item.stripePriceId) return
 
     setError('')
     setBusy(true)
-
     try {
-      const res = await fetch('/api/checkout', {
+      const res  = await fetch('/api/checkout', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
-          itemId,
-          itemType,
+          items:     [{ id: item.id, type: itemType, stripePriceId: item.stripePriceId, title: item.title }],
           uid:       user.uid,
           userEmail: user.email,
         }),
       })
-
       const data = await res.json()
-
-      if (!res.ok || !data.url) {
-        setError(data.error || 'Failed to start checkout.')
-        return
-      }
-
+      if (!res.ok || !data.url) { setError(data.error || 'Checkout failed.'); return }
       window.location.href = data.url
     } catch {
       setError('Network error. Please try again.')
@@ -88,90 +89,94 @@ export default function BuyButton({
     }
   }
 
-  const btnBase = `inline-flex items-center gap-2 font-mono tracking-[0.1em] uppercase
-                   transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed`
-  const btnSizes = featured
-    ? 'px-7 py-3.5 text-[10px]'
-    : 'px-3.5 py-2 text-[9px]'
-  const clipClass = featured ? 'clip-btn' : 'clip-btn-sm'
-
+  // ── States ────────────────────────────────────────────────────────────────
   if (checking) {
-    return (
-      <div className={`${btnBase} ${btnSizes} border border-sl-border text-sl-muted`}>
-        Checking...
-      </div>
-    )
+    return <div className="h-9 w-28 border border-sl-border animate-pulse bg-sl-surface" />
   }
 
-  // Already owned — show download button
+  // Owned — show download
   if (owned) {
-    if (downloadUrl) {
-      return (
-        <a
-          href={downloadUrl}
-          className={`${btnBase} ${btnSizes} ${clipClass} bg-sl-cyan text-sl-darker`}
-        >
-          <DownloadIcon />
-          Download
-        </a>
-      )
-    }
-    return (
-      <div className={`${btnBase} ${btnSizes} border border-sl-green text-sl-green cursor-default`}>
-        <CheckIcon />
-        In Library
+    const dl = 'downloadUrl' in item ? item.downloadUrl : null
+    return dl ? (
+      <a href={dl} className="inline-flex items-center gap-2 bg-sl-cyan text-sl-darker px-4 py-2 font-mono text-[9px] tracking-[0.1em] uppercase no-underline clip-btn-sm hover:bg-[#26a0ae] transition-colors">
+        <DownloadIcon /> Download
+      </a>
+    ) : (
+      <div className="inline-flex items-center gap-2 border border-sl-green text-sl-green px-4 py-2 font-mono text-[9px] tracking-[0.1em] uppercase">
+        <CheckIcon /> In Library
       </div>
     )
   }
 
-  // Not available for sale yet
-  if (!price) {
+  // Not for sale yet
+  if (!item.price || !('stripePriceId' in item) || !item.stripePriceId) {
     return (
-      <div className={`${btnBase} ${btnSizes} border border-sl-border text-sl-muted cursor-default`}>
-        Price TBD
+      <div className="inline-flex items-center px-4 py-2 font-mono text-[9px] tracking-[0.1em] uppercase border border-sl-border text-sl-muted cursor-default">
+        Not Yet Available
       </div>
     )
   }
 
-  // DLC requires parent game
-  if (requiresGameId && !parentOwned) {
+  // DLC locked
+  if (itemType === 'dlc' && !parentOwned) {
     return (
-      <div className="flex flex-col gap-1">
-        <div className={`${btnBase} ${btnSizes} border border-sl-border text-sl-muted cursor-not-allowed`}>
-          Requires Base Game
-        </div>
-        {error && <p className="font-mono text-[9px] text-sl-orange">{error}</p>}
+      <div className="inline-flex items-center px-4 py-2 font-mono text-[9px] tracking-[0.1em] uppercase border border-sl-border text-sl-muted cursor-not-allowed">
+        Requires Base Game
       </div>
     )
   }
 
+  // Available — show add to cart (+ buy now on detail pages)
   return (
-    <div className="flex flex-col gap-1">
-      <button
-        onClick={handleBuy}
-        disabled={busy}
-        className={`${btnBase} ${btnSizes} ${clipClass} bg-sl-orange text-sl-white hover:bg-[#c93a28]`}
-      >
-        {busy ? 'Redirecting...' : `Buy — $${price.toFixed(2)}`}
-      </button>
+    <div className="flex flex-col gap-1.5">
+      <div className={`flex ${showBothActions ? 'flex-col sm:flex-row' : 'flex-row'} gap-1.5`}>
+        {/* Add to cart */}
+        <button
+          onClick={handleAddToCart}
+          disabled={inCart || busy}
+          className={`
+            inline-flex items-center gap-2 font-mono text-[9px] tracking-[0.1em] uppercase
+            border transition-colors duration-200 px-4 py-2 clip-btn-sm
+            ${inCart
+              ? 'border-sl-cyan text-sl-cyan cursor-default'
+              : 'border-sl-border text-sl-mid hover:border-sl-white hover:text-sl-white'}
+          `}
+        >
+          <CartIcon />
+          {inCart ? 'In Cart' : 'Add to Cart'}
+        </button>
+
+        {/* Buy now — only shown on detail pages */}
+        {showBothActions && (
+          <button
+            onClick={handleBuyNow}
+            disabled={busy}
+            className="inline-flex items-center gap-2 bg-sl-orange text-sl-white px-4 py-2 font-mono text-[9px] tracking-[0.1em] uppercase clip-btn-sm hover:bg-[#c93a28] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {busy ? 'Redirecting...' : `Buy Now · $${item.price.toFixed(2)}`}
+          </button>
+        )}
+      </div>
       {error && <p className="font-mono text-[9px] text-sl-orange">{error}</p>}
     </div>
   )
 }
 
-function DownloadIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M7 1v8M4 6l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M2 11h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function CheckIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <polyline points="2,7 5.5,10.5 12,3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
+const DownloadIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M7 1v8M4 6l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M2 11h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+const CheckIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <polyline points="2,7 5.5,10.5 12,3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+const CartIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M2 2h1.5L5 9h6l1.5-5H4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="6" cy="11.5" r="0.8" fill="currentColor" />
+    <circle cx="10" cy="11.5" r="0.8" fill="currentColor" />
+  </svg>
+)

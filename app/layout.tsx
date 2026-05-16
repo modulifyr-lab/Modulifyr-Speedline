@@ -3,6 +3,7 @@ import { Syne, DM_Sans, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import SpeedCanvas from '@/components/SpeedCanvas'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { CartProvider } from '@/contexts/CartContext'
 
 const syne = Syne({
   subsets:  ['latin'],
@@ -55,8 +56,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="bg-sl-darker text-sl-white font-sans antialiased overflow-x-hidden">
         <AuthProvider>
-          <SpeedCanvas />
-          {children}
+          <CartProvider>
+            <SpeedCanvas />
+            {children}
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>
