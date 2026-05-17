@@ -41,8 +41,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing custom_data.' }, { status: 400 })
     }
 
-    import { addToWishlist } from '@/lib/wishlist'
-
     try {
       const db = await getServerDb()
 
@@ -75,7 +73,7 @@ export async function POST(req: NextRequest) {
               title:            itemTitle,
               purchasedAt:      Timestamp.now(),
               downloadUrl,
-              stripeSessionId:  txn.id,   // reusing field name for compatibility
+              paddleTransactionId:  txn.id,
               type:             itemType,
               ...(parentGameId ? { parentGameId } : {}),
             }

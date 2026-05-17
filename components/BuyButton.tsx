@@ -47,25 +47,25 @@ export default function BuyButton({
       router.push(`/auth?next=/games/${item.id}`)
       return
     }
-    if (!item.price || !('stripePriceId' in item) || !item.stripePriceId) return
+    if (!item.price || !('paddlePriceId' in item) || !item.paddlePriceId) return
     addItem({
       id:            item.id,
       type:          itemType,
       title:         item.title,
       price:         item.price,
-      stripePriceId: item.stripePriceId,
-      icon:          'icon' in item ? item.icon : '🎮',
+      paddlePriceId: item.paddlePriceId,
+      icon:          ('icon' in item && item.icon) ? item.icon : '🎮',
       artGradient,
     })
   }
 
-  // ── Buy now (direct Stripe checkout, skips cart) ─────────────────────────
+  // ── Buy now (direct Paddle checkout, skips cart) ─────────────────────────
   async function handleBuyNow() {
     if (!user) {
       router.push(`/auth?next=/games/${item.id}`)
       return
     }
-    if (!item.price || !('stripePriceId' in item) || !item.stripePriceId) return
+    if (!item.price || !('paddlePriceId' in item) || !item.paddlePriceId) return
 
     setError('')
     setBusy(true)
@@ -74,7 +74,7 @@ export default function BuyButton({
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
-          items:     [{ id: item.id, type: itemType, stripePriceId: item.stripePriceId, title: item.title }],
+          items:     [{ id: item.id, type: itemType, paddlePriceId: item.paddlePriceId, title: item.title }],
           uid:       user.uid,
           userEmail: user.email,
         }),
@@ -109,7 +109,7 @@ export default function BuyButton({
   }
 
   // Not for sale yet
-  if (!item.price || !('stripePriceId' in item) || !item.stripePriceId) {
+  if (!item.price || !('paddlePriceId' in item) || !item.paddlePriceId) {
     return (
       <div className="inline-flex items-center px-4 py-2 font-mono text-[9px] tracking-[0.1em] uppercase border border-sl-border text-sl-muted cursor-default">
         Not Yet Available

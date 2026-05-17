@@ -29,7 +29,7 @@ export default function CartDrawer() {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
-          items:     items.map(i => ({ id: i.id, type: i.type, stripePriceId: i.stripePriceId, title: i.title })),
+          items:     items.map(i => ({ id: i.id, type: i.type, paddlePriceId: i.paddlePriceId, title: i.title })),
           uid:       user.uid,
           userEmail: user.email,
         }),

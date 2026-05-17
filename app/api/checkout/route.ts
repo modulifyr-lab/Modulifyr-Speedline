@@ -4,7 +4,7 @@ import { createPaddleCheckout }       from '@/lib/paddle'
 interface CheckoutItem {
   id:            string
   type:          'game' | 'dlc'
-  stripePriceId: string   // field name kept for compatibility — this is now the Paddle price ID (pri_...)
+  paddlePriceId: string   // Paddle price ID (pri_...)
   title:         string
 }
 
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     for (const item of items) {
-      if (!item.stripePriceId) {
+      if (!item.paddlePriceId) {
         return NextResponse.json(
           { error: `${item.title} is not yet available for purchase.` },
           { status: 400 }
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     }
 
     const checkoutUrl = await createPaddleCheckout({
-      items: items.map(i => ({ priceId: i.stripePriceId, quantity: 1 })),
+      items: items.map(i => ({ priceId: i.paddlePriceId, quantity: 1 })),
       customerEmail: userEmail,
       customData: {
         uid,

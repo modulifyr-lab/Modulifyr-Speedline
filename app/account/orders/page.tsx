@@ -157,7 +157,7 @@ interface OrderGroup {
 function groupBySession(entries: LibraryEntry[]): OrderGroup[] {
   const map = new Map<string, LibraryEntry[]>()
   for (const entry of entries) {
-    const key = entry.stripeSessionId
+    const key = entry.paddleTransactionId ?? entry.gameId
     if (!map.has(key)) map.set(key, [])
     map.get(key)!.push(entry)
   }

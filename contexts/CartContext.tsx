@@ -14,7 +14,7 @@ export interface CartItem {
   type:         'game' | 'dlc'
   title:        string
   price:        number
-  stripePriceId: string
+  paddlePriceId: string
   icon:         string
   artGradient:  string
 }

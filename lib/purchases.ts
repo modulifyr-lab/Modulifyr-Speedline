@@ -12,7 +12,7 @@ export interface LibraryEntry {
   title:               string
   purchasedAt:         Timestamp
   downloadUrl:         string | null
-  lemonSqueezyOrderId: string
+  paddleTransactionId?: string
   type:                'game' | 'dlc'
   parentGameId?:       string  // set for DLC entries
 }

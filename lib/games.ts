@@ -15,7 +15,7 @@ export interface DLC {
   title:         string
   description:   string
   price:         number
-  stripePriceId: string
+  paddlePriceId: string
   downloadUrl?:  string | null
   icon?:         string
 }
@@ -29,7 +29,7 @@ export interface Game {
   status:          GameStatus
   platforms:       Platform[]
   price:           number | null
-  stripePriceId:   string | null
+  paddlePriceId:   string | null
   downloadUrl:     string | null
   steamUrl:        string | null
   directUrl:       string | null
@@ -58,7 +58,7 @@ export const games: Game[] = [
     status:        'in-development',
     platforms:     ['windows', 'mac'],
     price:         null,
-    stripePriceId: null,
+    paddlePriceId: 'pro_01krjz5zf4tkq9wzww2w9ezq2p',
     downloadUrl:   null,
     steamUrl:      null,
     directUrl:     null,
