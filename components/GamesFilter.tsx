@@ -1,7 +1,7 @@
 'use client'
 
 import { useState }  from 'react'
-import { Game, GameStatus, STATUS_LABELS } from '@/lib/games'
+import { Game, GameStatus } from '@/lib/games'
 import GameCard       from './GameCard'
 
 type Filter = 'all' | GameStatus

@@ -34,13 +34,11 @@ export async function createPaddleCheckout({
   customerEmail,
   customData,
   successUrl,
-  cancelUrl,
 }: {
   items:         PaddleCheckoutItem[]
   customerEmail: string
   customData:    Record<string, string>
   successUrl:    string
-  cancelUrl:     string
 }): Promise<string> {
   const res = await fetch(`${PADDLE_API_BASE}/transactions`, {
     method:  'POST',

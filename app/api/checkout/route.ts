@@ -39,7 +39,6 @@ export async function POST(req: NextRequest) {
         itemTitles: items.map(i => i.title).join('||'),
       },
       successUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/library?success=1`,
-      cancelUrl:  `${process.env.NEXT_PUBLIC_BASE_URL}/games`,
     })
 
     return NextResponse.json({ url: checkoutUrl })

@@ -162,7 +162,7 @@ export default function LibraryPage() {
   )
 }
 
-import { isWishlisted } from '@/lib/wishlist'
+
 
 function LibraryCard({ entry, isDLC = false }: { entry: LibraryEntry; isDLC?: boolean }) {
   const game         = getGameById(isDLC ? (entry.parentGameId ?? '') : entry.gameId)

@@ -23,8 +23,8 @@ export default function PrivacyPage() {
 
       <Section title="2. Data We Collect">
         <P><strong className="text-sl-white">Account data.</strong> When you create an account, we collect your email address. If you sign in with Google, we also receive your display name and profile photo from Google. This data is stored in Firebase Authentication.</P>
-        <P><strong className="text-sl-white">Purchase records.</strong> When you complete a purchase, we store a record containing: your Firebase user ID, the game or DLC purchased, the date of purchase, and the Stripe session ID for reference. This is stored in Firestore and constitutes your game library.</P>
-        <P><strong className="text-sl-white">Payment data.</strong> All payment processing is handled by Stripe. Modulifyr Speedline never sees or stores your card number, billing address, or any other payment details. Stripe's privacy policy governs how your payment data is handled. You can read it at stripe.com/privacy.</P>
+        <P><strong className="text-sl-white">Purchase records.</strong> When you complete a purchase, we store a record containing: your Firebase user ID, the game or DLC purchased, the date of purchase, and the Paddle transaction ID for reference. This is stored in Firestore and constitutes your game library.</P>
+        <P><strong className="text-sl-white">Payment data.</strong> All payment processing is handled by Paddle. Modulifyr Speedline never sees or stores your card number, billing address, or any other payment details. Paddle&apos;s privacy policy governs how your payment data is handled. You can read it at paddle.com/privacy.</P>
         <P><strong className="text-sl-white">Usage data.</strong> We do not currently run analytics or tracking scripts. We do not use cookies beyond what Firebase Authentication requires for session management.</P>
       </Section>
 
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
         </P>
         <ul>
           <Li><strong className="text-sl-white">Firebase (Google).</strong> Authentication and database. firebase.google.com/support/privacy</Li>
-          <Li><strong className="text-sl-white">Stripe.</strong> Payment processing. stripe.com/privacy</Li>
+          <Li><strong className="text-sl-white">Paddle.</strong> Payment processing. paddle.com/legal/privacy</Li>
           <Li><strong className="text-sl-white">Vercel.</strong> Website hosting. vercel.com/legal/privacy-policy</Li>
         </ul>
         <P>

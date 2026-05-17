@@ -13,7 +13,6 @@ import {
   GoogleAuthProvider,
   reauthenticateWithPopup,
 } from 'firebase/auth'
-import { addToWishlist, removeFromWishlist, isWishlisted, getWishlist } from '@/lib/wishlist'
 import { auth }     from '@/lib/firebase'
 import { useAuth }  from '@/contexts/AuthContext'
 import Nav          from '@/components/Nav'

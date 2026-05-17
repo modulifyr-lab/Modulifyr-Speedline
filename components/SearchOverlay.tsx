@@ -6,8 +6,6 @@ import { searchGames }                  from '@/lib/games'
 import { STATUS_LABELS, PLATFORM_LABELS } from '@/lib/games'
 import type { Game }                    from '@/lib/games'
 
-import { addToWishlist, removeFromWishlist, isWishlisted } from '@/lib/wishlist'
-
 interface SearchOverlayProps {
   isOpen:  boolean
   onClose: () => void

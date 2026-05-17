@@ -22,7 +22,7 @@
  *   }
  */
 
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app'
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app'
 import { getAuth, signInWithEmailAndPassword }          from 'firebase/auth'
 import { getFirestore }                                  from 'firebase/firestore'
 

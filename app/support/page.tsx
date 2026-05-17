@@ -26,11 +26,11 @@ const FAQS = [
       },
       {
         q: 'Do you have DRM?',
-        a: 'Direct purchases from this site have no DRM. Steam purchases are subject to Steam\'s own DRM policies.',
+        a: 'Direct purchases from this site have no DRM. Steam purchases are subject to Steam&apos;s own DRM policies.',
       },
       {
         q: 'Can I use a discount code?',
-        a: 'Yes. Discount codes can be entered directly on the Stripe checkout page. If you have a valid code, it will be applied before payment.',
+        a: 'Yes. Discount codes can be entered directly on the Paddle checkout page. If you have a valid code, it will be applied before payment.',
       },
     ],
   },
@@ -50,8 +50,8 @@ const FAQS = [
         a: 'Each game lists its supported platforms on the game page. Most titles support Windows. Selected titles also support macOS and Linux.',
       },
       {
-        q: 'I bought the game but it\'s not in my library.',
-        a: 'Library updates are processed by Stripe webhook, which typically takes a few seconds. Wait one minute and refresh your library page. If it still hasn\'t appeared after 10 minutes, contact support with your purchase confirmation email.',
+        q: 'I bought the game but it&apos;s not in my library.',
+        a: 'Library updates are processed by Paddle webhook, which typically takes a few seconds. Wait one minute and refresh your library page. If it still hasn&apos;t appeared after 10 minutes, contact support with your purchase confirmation email.',
       },
     ],
   },
@@ -107,7 +107,7 @@ export default function SupportPage() {
           </h1>
           <p className="text-sl-muted text-[14px] leading-relaxed max-w-[520px]">
             Answers to common questions about purchases, downloads, refunds, and accounts.
-            Can't find what you need? Email us directly.
+            Can&apos;t find what you need? Email us directly.
           </p>
           <a
             href="mailto:support@modulifyr.com"
