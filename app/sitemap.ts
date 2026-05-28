@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 import { games }         from '@/lib/games'
 
-const BASE = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://modulifyr-speedline.vercel.app'
+const BASE = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://speedline.modulifyr.com'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const gamePages = games.map(game => ({

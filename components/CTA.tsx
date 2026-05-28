@@ -21,7 +21,7 @@ export default function CTA() {
                 Contact Speedline
                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </a>
-              <Link href="https://modulifyr.vercel.app" target="_blank"
+              <Link href="https://modulifyr.com" target="_blank"
                 className="inline-flex items-center gap-2 text-sl-mid font-mono text-[10px] tracking-[0.12em] uppercase no-underline pb-2.5 border-b border-sl-border transition-colors duration-200 hover:text-sl-white hover:border-sl-mid">
                 Visit Modulifyr HQ →
               </Link>

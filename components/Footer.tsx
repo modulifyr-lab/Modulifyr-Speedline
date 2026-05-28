@@ -30,7 +30,7 @@ const FOOTER_COLS = [
   {
     heading: 'Company',
     links: [
-      { label: 'Modulifyr HQ',      href: 'https://modulifyr.vercel.app', external: true },
+      { label: 'Modulifyr HQ',      href: 'https://modulifyr.com', external: true },
       { label: 'Contact',           href: 'modulifyr.com'   },
     ],
   },
@@ -86,7 +86,7 @@ export default function Footer() {
           </span>
           <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted">
             A division of{' '}
-            <Link href="https://modulifyr.vercel.app" target="_blank" rel="noopener noreferrer" className="text-sl-orange no-underline hover:underline">
+            <Link href="https://modulifyr.com" target="_blank" rel="noopener noreferrer" className="text-sl-orange no-underline hover:underline">
               Modulifyr
             </Link>
             {' '}· Sole Proprietor: Rijan
