@@ -1,3 +1,5 @@
+'use client'
+
 import Link   from 'next/link'
 import Reveal  from './Reveal'
 
@@ -9,10 +11,10 @@ export default function CTA() {
         <Reveal>
           <div className="text-center">
             <span className="block font-mono text-[10px] tracking-[0.2em] uppercase text-sl-orange mb-6">Get In Touch</span>
-            <h2 className="font-syne font-extrabold text-sl-white leading-none tracking-tight mb-5" style={{ fontSize: 'clamp(32px, 6vw, 80px)' }}>
+            <h2 className="font-syne font-extrabold leading-none tracking-tight mb-5" style={{ fontSize: 'clamp(32px, 6vw, 80px)', color: 'var(--color-text)' }}>
               Have a Game<br />Worth{' '}<span className="text-sl-orange">Building?</span>
             </h2>
-            <p className="text-[15px] sm:text-[16px] text-sl-light max-w-[460px] mx-auto leading-[1.7] mb-9">
+            <p className="text-[15px] sm:text-[16px] max-w-[460px] mx-auto leading-[1.7] mb-9" style={{ color: 'var(--color-text-secondary)' }}>
               Speedline is in active development. If you have a licensing inquiry or want to discuss a game concept that requires serious engineering, send a direct message.
             </p>
             <div className="flex items-center justify-center gap-4 sm:gap-5 flex-wrap">
@@ -22,11 +24,11 @@ export default function CTA() {
                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </a>
               <Link href="https://modulifyr.com" target="_blank"
-                className="inline-flex items-center gap-2 text-sl-mid font-mono text-[10px] tracking-[0.12em] uppercase no-underline pb-2.5 border-b border-sl-border transition-colors duration-200 hover:text-sl-white hover:border-sl-mid">
+                className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] uppercase no-underline pb-2.5 border-b border-sl-border transition-colors duration-200 hover:border-sl-mid" style={{ color: 'var(--color-text-muted)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text)' } onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)' }>
                 Visit Modulifyr HQ →
               </Link>
             </div>
-            <p className="mt-7 font-mono text-[9px] tracking-[0.12em] uppercase text-sl-muted">
+            <p className="mt-7 font-mono text-[9px] tracking-[0.12em] uppercase" style={{ color: 'var(--color-text-muted)' }}>
               Modulifyr Speedline · A Division of Modulifyr · Birtamode, Jhapa, Nepal
             </p>
           </div>

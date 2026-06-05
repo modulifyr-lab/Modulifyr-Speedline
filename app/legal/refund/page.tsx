@@ -127,7 +127,7 @@ export default function RefundPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-10">
-      <h2 className="font-syne font-bold text-[18px] text-sl-white mb-1">{title}</h2>
+      <h2 className="font-syne font-bold text-[18px] mb-1" style={{ color: 'var(--color-text)' }}>{title}</h2>
       <div className="w-7 h-0.5 bg-sl-orange mb-4" />
       <div className="flex flex-col gap-3">{children}</div>
     </div>
@@ -135,12 +135,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function P({ children }: { children: React.ReactNode }) {
-  return <p className="text-sl-light text-[14px] leading-[1.8]">{children}</p>
+  return <p className="text-[14px] leading-[1.8]" style={{ color: 'var(--color-text-secondary)' }}>{children}</p>
 }
 
 function Li({ children }: { children: React.ReactNode }) {
   return (
-    <li className="flex items-start gap-2.5 text-sl-light text-[14px] leading-[1.8]">
+    <li className="flex items-start gap-2.5 text-[14px] leading-[1.8]" style={{ color: 'var(--color-text-secondary)' }}>
       <span className="mt-2 w-1 h-1 rounded-full bg-sl-orange flex-shrink-0" />
       <span>{children}</span>
     </li>

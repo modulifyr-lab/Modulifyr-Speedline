@@ -4,25 +4,26 @@ import './globals.css'
 import SpeedCanvas from '@/components/SpeedCanvas'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { CartProvider } from '@/contexts/CartContext'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 const syne = Syne({
   subsets:  ['latin'],
   variable: '--font-syne',
-  weight:   ['400', '500', '600', '700', '800'],
+  weight:  ['400', '500', '600', '700', '800'],
   display:  'swap',
 })
 
 const dmSans = DM_Sans({
   subsets:  ['latin'],
   variable: '--font-dm-sans',
-  weight:   ['300', '400', '500', '600'],
+  weight:  ['300', '400', '500', '600'],
   display:  'swap',
 })
 
 const jetbrainsMono = JetBrains_Mono({
   subsets:  ['latin'],
   variable: '--font-jetbrains-mono',
-  weight:   ['400', '500'],
+  weight:  ['400', '500'],
   display:  'swap',
 })
 
@@ -53,14 +54,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       className={`${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
     >
-      <body className="bg-sl-darker text-sl-white font-sans antialiased overflow-x-hidden">
-        <AuthProvider>
-          <CartProvider>
-            <SpeedCanvas />
-            {children}
-          </CartProvider>
-        </AuthProvider>
+      <body className="font-sans antialiased overflow-x-hidden transition-colors duration-300">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <AuthProvider>
+            <CartProvider>
+              <SpeedCanvas />
+              {children}
+            </CartProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

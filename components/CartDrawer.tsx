@@ -55,7 +55,8 @@ export default function CartDrawer() {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-[rgba(0,0,0,0.6)]"
+          className="fixed inset-0 z-40"
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
           onClick={closeCart}
           aria-hidden="true"
         />
@@ -65,25 +66,29 @@ export default function CartDrawer() {
       <div
         className={`
           fixed top-0 right-0 z-50 h-full w-full max-w-[420px]
-          bg-sl-darker border-l border-sl-border
+          border-l border-sl-border
           flex flex-col
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         `}
+        style={{ backgroundColor: 'var(--color-bg)' }}
         role="dialog"
         aria-label="Shopping cart"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-sl-border flex-shrink-0">
           <div>
-            <h2 className="font-syne font-bold text-[18px] text-sl-white">Cart</h2>
-            <p className="font-mono text-[9px] tracking-[0.12em] uppercase text-sl-muted mt-0.5">
+            <h2 className="font-syne font-bold text-[18px]" style={{ color: 'var(--color-text)' }}>Cart</h2>
+            <p className="font-mono text-[9px] tracking-[0.12em] uppercase mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
               {itemCount} {itemCount === 1 ? 'item' : 'items'}
             </p>
           </div>
           <button
             onClick={closeCart}
-            className="text-sl-muted hover:text-sl-white transition-colors p-1"
+            className="transition-colors p-1"
+            style={{ color: 'var(--color-text-muted)' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text)' }
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)' }
             aria-label="Close cart"
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -98,13 +103,13 @@ export default function CartDrawer() {
             <div className="flex flex-col items-center justify-center h-full gap-3 px-6">
               <div className="w-12 h-12 border border-sl-border flex items-center justify-center">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M3 3h2l2.4 9.6A2 2 0 0 0 9.3 14H16a2 2 0 0 0 1.9-1.4L19 7H5" stroke="#5A5A5A" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="9" cy="17" r="1" fill="#5A5A5A" />
-                  <circle cx="16" cy="17" r="1" fill="#5A5A5A" />
+                  <path d="M3 3h2l2.4 9.6A2 2 0 0 0 9.3 14H16a2 2 0 0 0 1.9-1.4L19 7H5" stroke="var(--color-text-muted)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="9" cy="17" r="1" fill="var(--color-text-muted)" />
+                  <circle cx="16" cy="17" r="1" fill="var(--color-text-muted)" />
                 </svg>
               </div>
-              <p className="font-syne font-bold text-[15px] text-sl-white">Your cart is empty</p>
-              <p className="font-mono text-[10px] tracking-[0.1em] uppercase text-sl-muted text-center">
+              <p className="font-syne font-bold text-[15px]" style={{ color: 'var(--color-text)' }}>Your cart is empty</p>
+              <p className="font-mono text-[10px] tracking-[0.1em] uppercase text-center" style={{ color: 'var(--color-text-muted)' }}>
                 Browse the shop and add games to get started.
               </p>
               <button
@@ -128,19 +133,22 @@ export default function CartDrawer() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-syne font-bold text-[13px] text-sl-white truncate">{item.title}</p>
-                    <p className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted mt-0.5">
+                    <p className="font-syne font-bold text-[13px] truncate" style={{ color: 'var(--color-text)' }}>{item.title}</p>
+                    <p className="font-mono text-[9px] tracking-[0.1em] uppercase mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
                       {item.type === 'dlc' ? 'DLC' : 'Game'} · Buy Once, Own Forever
                     </p>
                   </div>
 
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    <span className="font-syne font-bold text-[15px] text-sl-white">
+                    <span className="font-syne font-bold text-[15px]" style={{ color: 'var(--color-text)' }}>
                       ${item.price.toFixed(2)}
                     </span>
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-sl-muted hover:text-sl-orange transition-colors"
+                      className="transition-colors"
+                      style={{ color: 'var(--color-text-muted)' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#E84530' }
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)' }
                       aria-label={`Remove ${item.title}`}
                     >
                       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -169,14 +177,14 @@ export default function CartDrawer() {
 
             {/* Total */}
             <div className="flex items-center justify-between mb-4">
-              <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-sl-muted">Total</span>
-              <span className="font-syne font-extrabold text-[22px] text-sl-white">
+              <span className="font-mono text-[10px] tracking-[0.1em] uppercase" style={{ color: 'var(--color-text-muted)' }}>Total</span>
+              <span className="font-syne font-extrabold text-[22px]" style={{ color: 'var(--color-text)' }}>
                 ${total.toFixed(2)}
               </span>
             </div>
 
             {/* Promo code note */}
-            <p className="font-mono text-[8px] tracking-[0.1em] uppercase text-sl-muted mb-3">
+            <p className="font-mono text-[8px] tracking-[0.1em] uppercase mb-3" style={{ color: 'var(--color-text-muted)' }}>
               Promo codes can be applied at checkout.
             </p>
 
@@ -194,7 +202,10 @@ export default function CartDrawer() {
 
             <button
               onClick={clearCart}
-              className="w-full mt-2 font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted hover:text-sl-white transition-colors py-2"
+              className="w-full mt-2 font-mono text-[9px] tracking-[0.1em] uppercase transition-colors py-2"
+              style={{ color: 'var(--color-text-muted)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text)' }
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)' }
             >
               Clear cart
             </button>

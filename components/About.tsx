@@ -67,7 +67,7 @@ const PILLARS = [
 
 export default function About() {
   return (
-    <section id="about" className="relative z-10 py-[104px] border-b border-sl-border bg-sl-surface">
+    <section id="about" className="relative z-10 py-[104px] border-b border-sl-border" style={{ backgroundColor: 'var(--color-surface)' }}>
       <div className="max-w-[1120px] mx-auto px-12">
         <div className="grid gap-[72px]" style={{ gridTemplateColumns: '1fr 1fr' }}>
 
@@ -77,24 +77,24 @@ export default function About() {
               02 — About the Studio
             </span>
             <h2
-              className="font-syne font-extrabold text-sl-white leading-[1.05] tracking-tight"
-              style={{ fontSize: 'clamp(34px, 4vw, 52px)' }}
+              className="font-syne font-extrabold leading-[1.05] tracking-tight"
+              style={{ fontSize: 'clamp(34px, 4vw, 52px)', color: 'var(--color-text)' }}
             >
               Gaming, the<br />Modulifyr Way.
             </h2>
             <div className="w-9 h-0.5 bg-sl-orange my-7" />
-            <p className="text-sl-light text-[15px] leading-[1.7] mb-3.5">
+            <p className="text-[15px] leading-[1.7] mb-3.5" style={{ color: 'var(--color-text-secondary)' }}>
               Speedline is the game development arm of Modulifyr. We apply the
               same engineering discipline from our software practice directly to
               desktop game development.
             </p>
-            <p className="text-sl-light text-[15px] leading-[1.7] mb-3.5">
+            <p className="text-[15px] leading-[1.7] mb-3.5" style={{ color: 'var(--color-text-secondary)' }}>
               Most studios prototype fast and refactor never. We design
               architecture before we write gameplay — cleaner code, faster
               iteration post-launch, and games that can be maintained and
               updated long-term.
             </p>
-            <p className="text-sl-light text-[15px] leading-[1.7]">
+            <p className="text-[15px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
               We ship on Steam and sell directly. Two channels. We own both.
             </p>
           </Reveal>
@@ -105,13 +105,14 @@ export default function About() {
               {PILLARS.map(p => (
                 <div
                   key={p.title}
-                  className={`pillar-bar ${p.accent} relative bg-sl-darker border border-sl-border px-6 py-5 transition-colors duration-200`}
+                  className={`pillar-bar ${p.accent} relative border border-sl-border px-6 py-5 transition-colors duration-200`}
+                  style={{ backgroundColor: 'var(--color-bg)' }}
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-syne font-bold text-[14px] text-sl-white">{p.title}</span>
+                    <span className="font-syne font-bold text-[14px]" style={{ color: 'var(--color-text)' }}>{p.title}</span>
                     <p.Icon />
                   </div>
-                  <p className="text-[12px] text-sl-muted leading-relaxed m-0">{p.body}</p>
+                  <p className="text-[12px] leading-relaxed m-0" style={{ color: 'var(--color-text-muted)' }}>{p.body}</p>
                 </div>
               ))}
             </div>

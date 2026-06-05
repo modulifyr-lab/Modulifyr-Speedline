@@ -46,11 +46,12 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
     <article
       className={`
         group relative flex flex-col overflow-hidden
-        bg-sl-surface border border-sl-border
+        border border-sl-border
         transition-colors duration-250
         hover:border-[rgba(232,69,48,0.5)]
         ${featured ? 'col-span-1 sm:col-span-2' : ''}
       `}
+      style={{ backgroundColor: 'var(--color-surface)' }}
     >
       {/* Art area — clicking this navigates to the detail page */}
       <Link
@@ -64,13 +65,13 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
         >
           <div className="absolute inset-0 flex items-center justify-center">
             <span
-              className="text-sl-border select-none"
-              style={{ fontSize: featured ? '72px' : '52px' }}
+              className="select-none"
+              style={{ fontSize: featured ? '72px' : '52px', color: 'var(--color-border)' }}
               aria-hidden="true"
             >
               {game.icon}
             </span>
-            <span className="absolute bottom-3 right-3.5 font-mono text-[9px] tracking-[0.15em] uppercase text-sl-border select-none">
+            <span className="absolute bottom-3 right-3.5 font-mono text-[9px] tracking-[0.15em] uppercase select-none" style={{ color: 'var(--color-border)' }}>
               Cover Art
             </span>
           </div>
@@ -86,8 +87,9 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
               <span
                 key={p}
                 className="font-mono text-[9px] tracking-[0.08em] uppercase
-                           text-sl-mid border border-sl-border px-2 py-0.5
-                           bg-[rgba(8,8,8,0.7)] backdrop-blur-sm"
+                           border border-sl-border px-2 py-0.5
+                           backdrop-blur-sm"
+                style={{ color: 'var(--color-text-secondary)', backgroundColor: 'rgba(var(--color-bg-rgb), 0.7)' }}
               >
                 {PLATFORM_LABELS[p]}
               </span>
@@ -107,23 +109,23 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
 
         {/* Title links to detail page */}
         <Link href={`/games/${game.id}`} className="no-underline group/title">
-          <h3 className={`font-syne font-bold text-sl-white leading-tight mb-2 group-hover/title:text-sl-orange transition-colors duration-200 ${featured ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'}`}>
+          <h3 className={`font-syne font-bold leading-tight mb-2 group-hover/title:text-sl-orange transition-colors duration-200 ${featured ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'}`} style={{ color: 'var(--color-text)' }}>
             {game.title}
           </h3>
         </Link>
 
-        <p className="text-[13px] text-sl-muted leading-relaxed flex-1 mb-5">
+        <p className="text-[13px] leading-relaxed flex-1 mb-5" style={{ color: 'var(--color-text-muted)' }}>
           {game.description}
         </p>
 
         {/* Footer: price + actions */}
         <div className="flex items-center justify-between flex-wrap gap-2.5 pt-4 border-t border-sl-border">
           {showPrice ? (
-            <span className="font-syne font-bold text-[18px] text-sl-white">
+            <span className="font-syne font-bold text-[18px]" style={{ color: 'var(--color-text)' }}>
               ${game.price?.toFixed(2)}
             </span>
           ) : (
-            <span className="font-mono text-[10px] tracking-[0.1em] text-sl-muted">
+            <span className="font-mono text-[10px] tracking-[0.1em]" style={{ color: 'var(--color-text-muted)' }}>
               Price TBD
             </span>
           )}
@@ -145,9 +147,12 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
                 href={game.steamUrl!}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 bg-sl-surface2 border border-sl-border
-                           text-sl-light px-3 py-2 font-mono text-[9px] tracking-[0.1em] uppercase
-                           no-underline transition-colors duration-200 hover:border-sl-mid hover:text-sl-white"
+                className="inline-flex items-center gap-1.5 border border-sl-border
+                           px-3 py-2 font-mono text-[9px] tracking-[0.1em] uppercase
+                           no-underline transition-colors duration-200 hover:border-sl-mid"
+                style={{ backgroundColor: 'var(--color-surface2)', color: 'var(--color-text-secondary)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-secondary)')}
               >
                 {STEAM_ICON}
                 {game.status === 'available' ? 'Buy on Steam' : 'Wishlist'}
@@ -164,8 +169,9 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
                   border transition-colors duration-200 cursor-pointer
                   ${notified
                     ? 'border-sl-green text-sl-green cursor-default'
-                    : 'border-sl-border text-sl-muted hover:border-sl-orange hover:text-sl-orange'}
+                    : 'border-sl-border hover:border-sl-orange hover:text-sl-orange'}
                 `}
+                style={{ color: notified ? undefined : 'var(--color-text-muted)' }}
               >
                 {notified ? <CheckIcon /> : <BellIcon />}
                 {notified ? 'On the List' : 'Notify Me'}

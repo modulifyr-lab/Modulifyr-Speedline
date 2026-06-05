@@ -3,22 +3,54 @@
 /* ── TAILWIND THEME CUSTOMIZATION (for Tailwind v4) ── */
 @theme {
   /* Brand accent colors */
-  --color-sl-orange:  #E84530;
-  --color-sl-blue:    #2B7FA8;
-  --color-sl-amber:   #F5B52E;
-  --color-sl-cyan:    #2FB8C8;
-  --color-sl-green:   #22C55E;
-  /* Background / surface hierarchy */
-  --color-sl-darker:  #080808;
-  --color-sl-dark:    #0D0D0D;
+  --color-sl-orange: #E84530;
+  --color-sl-blue: #2B7FA8;
+  --color-sl-amber: #F5B52E;
+  --color-sl-cyan: #2FB8C8;
+  --color-sl-green: #22C55E;
+
+  /* Dynamic colors */
+  --color-bg: var(--color-bg-dark);
+  --color-bg-secondary: var(--color-bg-secondary-dark);
+  --color-surface: var(--color-surface-dark);
+  --color-surface2: var(--color-surface2-dark);
+  --color-border: var(--color-border-dark);
+  --color-text: var(--color-text-dark);
+  --color-text-muted: var(--color-text-muted-dark);
+  --color-text-secondary: var(--color-text-secondary-dark);
+
+  /* Dark mode colors */
+  --color-bg-dark: #080808;
+  --color-bg-dark-rgb: 8, 8, 8;
+  --color-bg-secondary-dark: #0D0D0D;
+  --color-surface-dark: #141414;
+  --color-surface2-dark: #1C1C1C;
+  --color-border-dark: #242424;
+  --color-text-muted-dark: #5A5A5A;
+  --color-text-secondary-dark: #8A8A8A;
+  --color-text-dark: #F5F5F5;
+
+  /* Light mode colors */
+  --color-bg-light: #F5F5F5;
+  --color-bg-light-rgb: 245, 245, 245;
+  --color-bg-secondary-light: #EDEDED;
+  --color-surface-light: #FFFFFF;
+  --color-surface2-light: #F0F0F0;
+  --color-border-light: #D0D0D0;
+  --color-text-muted-light: #8A8A8A;
+  --color-text-secondary-light: #5A5A5A;
+  --color-text-light: #0D0D0D;
+
+  /* Legacy colors (for compatibility) */
+  --color-sl-darker: #080808;
+  --color-sl-dark: #0D0D0D;
   --color-sl-surface: #141414;
-  --color-sl-surface2:#1C1C1C;
-  --color-sl-border:  #242424;
-  /* Text scale */
-  --color-sl-muted:   #5A5A5A;
-  --color-sl-mid:     #8A8A8A;
-  --color-sl-light:   #D4D4D4;
-  --color-sl-white:   #F5F5F5;
+  --color-sl-surface2: #1C1C1C;
+  --color-sl-border: #242424;
+  --color-sl-muted: #5A5A5A;
+  --color-sl-mid: #8A8A8A;
+  --color-sl-light: #D4D4D4;
+  --color-sl-white: #F5F5F5;
 
   /* Font families */
   --font-family-syne: var(--font-syne);
@@ -37,6 +69,34 @@
   --animate-fadeUp4: fadeUp 0.7s ease 0.45s both;
 }
 
+/* Default to dark mode */
+:root {
+  --color-bg: var(--color-bg-dark);
+  --color-bg-rgb: var(--color-bg-dark-rgb);
+  --color-bg-secondary: var(--color-bg-secondary-dark);
+  --color-surface: var(--color-surface-dark);
+  --color-surface2: var(--color-surface2-dark);
+  --color-border: var(--color-border-dark);
+  --color-text: var(--color-text-dark);
+  --color-text-muted: var(--color-text-muted-dark);
+  --color-text-secondary: var(--color-text-secondary-dark);
+  --color-text-stroke: rgba(245, 245, 245, 0.2);
+}
+
+/* Light mode */
+.light {
+  --color-bg: var(--color-bg-light);
+  --color-bg-rgb: var(--color-bg-light-rgb);
+  --color-bg-secondary: var(--color-bg-secondary-light);
+  --color-surface: var(--color-surface-light);
+  --color-surface2: var(--color-surface2-light);
+  --color-border: var(--color-border-light);
+  --color-text: var(--color-text-light);
+  --color-text-muted: var(--color-text-muted-light);
+  --color-text-secondary: var(--color-text-secondary-light);
+  --color-text-stroke: rgba(13, 13, 13, 0.2);
+}
+
 /* ── KEYFRAMES ── */
 @keyframes marquee {
   0%   { transform: translateX(0); }
@@ -53,9 +113,22 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-dm-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar       { width: 3px; }
-::-webkit-scrollbar-track { background: #080808; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
 ::-webkit-scrollbar-thumb { background: #E84530; }
 
 /* ── REUSABLE CLIP-PATH SHAPES ── */

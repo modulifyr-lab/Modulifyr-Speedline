@@ -1,3 +1,5 @@
+'use client'
+
 import Link            from 'next/link'
 import Nav             from '@/components/Nav'
 import Footer          from '@/components/Footer'
@@ -19,26 +21,26 @@ export default function LegalLayout({ title, subtitle, lastUpdated, children }: 
       <section className="relative z-10 pt-32 pb-12 border-b border-sl-border">
         <div className="max-w-[860px] mx-auto px-5 sm:px-8 md:px-12">
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <Link href="/" className="font-mono text-[9px] tracking-[0.12em] uppercase text-sl-muted no-underline hover:text-sl-white transition-colors">
+            <Link href="/" className="font-mono text-[9px] tracking-[0.12em] uppercase no-underline transition-colors" style={{ color: 'var(--color-text-muted)' }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text)'} onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text-muted)'}>
               Home
             </Link>
-            <span className="text-sl-border font-mono text-[9px]">/</span>
-            <span className="font-mono text-[9px] tracking-[0.12em] uppercase text-sl-muted">Legal</span>
-            <span className="text-sl-border font-mono text-[9px]">/</span>
+            <span className="font-mono text-[9px]" style={{ color: 'var(--color-border)' }}>/</span>
+            <span className="font-mono text-[9px] tracking-[0.12em] uppercase" style={{ color: 'var(--color-text-muted)' }}>Legal</span>
+            <span className="font-mono text-[9px]" style={{ color: 'var(--color-border)' }}>/</span>
             <span className="font-mono text-[9px] tracking-[0.12em] uppercase text-sl-orange">{title}</span>
           </div>
-          <h1 className="font-syne font-extrabold text-[32px] sm:text-[40px] text-sl-white leading-tight mb-2">
+          <h1 className="font-syne font-extrabold text-[32px] sm:text-[40px] leading-tight mb-2" style={{ color: 'var(--color-text)' }}>
             {title}
           </h1>
-          <p className="text-sl-muted text-[14px]">{subtitle}</p>
-          <p className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-border mt-3">
+          <p className="text-[14px]" style={{ color: 'var(--color-text-muted)' }}>{subtitle}</p>
+          <p className="font-mono text-[9px] tracking-[0.1em] uppercase mt-3" style={{ color: 'var(--color-border)' }}>
             Last updated: {lastUpdated}
           </p>
         </div>
       </section>
 
       {/* Legal nav strip */}
-      <div className="relative z-10 border-b border-sl-border bg-sl-surface">
+      <div className="relative z-10 border-b border-sl-border" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="max-w-[860px] mx-auto px-5 sm:px-8 md:px-12">
           <div className="flex gap-6 py-3 overflow-x-auto">
             {[
@@ -49,8 +51,10 @@ export default function LegalLayout({ title, subtitle, lastUpdated, children }: 
               <Link
                 key={l.href}
                 href={l.href}
-                className="font-mono text-[9px] tracking-[0.12em] uppercase whitespace-nowrap
-                           text-sl-muted no-underline hover:text-sl-white transition-colors"
+                className="font-mono text-[9px] tracking-[0.12em] uppercase whitespace-nowrap no-underline transition-colors"
+                style={{ color: 'var(--color-text-muted)' }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text-muted)'}
               >
                 {l.label}
               </Link>

@@ -4,6 +4,8 @@ import Link              from 'next/link'
 import Image             from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
+import { useTheme } from 'next-themes'
+import { Sun, Moon } from 'lucide-react'
 import { useAuth }        from '@/contexts/AuthContext'
 import { useCart }        from '@/contexts/CartContext'
 import CartDrawer         from './CartDrawer'
@@ -22,11 +24,17 @@ export default function Nav() {
   const router   = useRouter()
   const { user, signOut }          = useAuth()
   const { itemCount, openCart }    = useCart()
+  const { theme, setTheme, resolvedTheme } = useTheme()
 
   const [scrolled,      setScrolled]      = useState(false)
   const [accountOpen,   setAccountOpen]   = useState(false)
   const [mobileOpen,    setMobileOpen]    = useState(false)
   const [searchOpen,    setSearchOpen]    = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -63,15 +71,18 @@ export default function Nav() {
           fixed top-0 left-0 right-0 z-30
           flex items-center justify-between
           px-5 sm:px-8 md:px-12 h-16
-          border-b border-sl-border
-          transition-all duration-200
-          ${scrolled ? 'bg-[rgba(8,8,8,0.95)] backdrop-blur-xl' : 'bg-[rgba(8,8,8,0.8)] backdrop-blur-md'}
+          border-b transition-all duration-200
         `}
+        style={{
+          borderColor: "var(--color-border)",
+          backgroundColor: scrolled ? "rgba(var(--color-bg-rgb), 0.95)" : "rgba(var(--color-bg-rgb), 0.8)",
+          backdropFilter: "blur(12px)"
+        }}
       >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 no-underline flex-shrink-0">
           <Image src="/logo.png" alt="Modulifyr" width={28} height={28} className="flex-shrink-0" priority />
-          <div className="font-syne font-bold text-[13px] text-sl-white leading-tight">
+          <div className="font-syne font-bold text-[13px] leading-tight" style={{ color: 'var(--color-text)' }}>
             <span className="hidden sm:block">Modulifyr Speedline</span>
             <span className="sm:hidden">Speedline</span>
             <em className="block not-italic font-mono font-normal text-[9px] text-sl-orange tracking-[0.15em] uppercase">
@@ -85,7 +96,11 @@ export default function Nav() {
           {NAV_LINKS.map(link => (
             <li key={link.href}>
               <Link href={link.href}
-                className={`font-mono text-[10px] tracking-[0.1em] uppercase no-underline transition-colors duration-200 ${link.href === pathname ? 'text-sl-white' : 'text-sl-mid hover:text-sl-white'}`}>
+                className="font-mono text-[10px] tracking-[0.1em] uppercase no-underline transition-colors duration-200"
+                style={{ color: link.href === pathname ? 'var(--color-text)' : 'var(--color-text-muted)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = link.href === pathname ? 'var(--color-text)' : 'var(--color-text-muted)')}
+                >
                 {link.label}
               </Link>
             </li>
@@ -93,7 +108,11 @@ export default function Nav() {
           {user && (
             <li>
               <Link href="/library"
-                className={`font-mono text-[10px] tracking-[0.1em] uppercase no-underline transition-colors duration-200 ${pathname === '/library' ? 'text-sl-white' : 'text-sl-mid hover:text-sl-white'}`}>
+                className="font-mono text-[10px] tracking-[0.1em] uppercase no-underline transition-colors duration-200"
+                style={{ color: pathname === '/library' ? 'var(--color-text)' : 'var(--color-text-muted)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = pathname === '/library' ? 'var(--color-text)' : 'var(--color-text-muted)')}
+                >
                 Library
               </Link>
             </li>
@@ -101,25 +120,46 @@ export default function Nav() {
         </ul>
 
         {/* Right actions */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Search */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Theme Toggle */}
+        {mounted && (
           <button
-            onClick={() => setSearchOpen(true)}
-            className="flex items-center gap-1.5 text-sl-muted hover:text-sl-white transition-colors p-1"
-            aria-label="Search games (Ctrl+K)"
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            className="flex items-center justify-center p-2 rounded-full transition-colors"
+            aria-label="Toggle theme"
+            style={{ color: "var(--color-text)" }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.2" />
-              <line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-            <span className="hidden sm:block font-mono text-[9px] tracking-[0.1em] text-sl-border">⌘K</span>
+            {resolvedTheme === "dark" ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
           </button>
+        )}
+        {/* Search */}
+        <button
+          onClick={() => setSearchOpen(true)}
+          className="flex items-center gap-1.5 transition-colors p-1"
+          aria-label="Search games (Ctrl+K)"
+          style={{ color: "var(--color-text-muted)" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-muted)")}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.2" />
+            <line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+          <span className="hidden sm:block font-mono text-[9px] tracking-[0.1em]" style={{ color: "var(--color-border)" }}>⌘K</span>
+        </button>
 
           {/* Cart */}
           <button
             onClick={openCart}
-            className="relative flex items-center text-sl-muted hover:text-sl-white transition-colors p-1"
+            className="relative flex items-center transition-colors p-1"
             aria-label={`Cart (${itemCount} items)`}
+            style={{ color: "var(--color-text-muted)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-muted)")}
           >
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path d="M3 3h2l2.4 9.6A2 2 0 0 0 9.3 14H16a2 2 0 0 0 1.9-1.4L19 7H5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -127,7 +167,7 @@ export default function Nav() {
               <circle cx="16" cy="17" r="1" fill="currentColor" />
             </svg>
             {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-sl-orange text-sl-white font-mono text-[8px] flex items-center justify-center px-0.5 leading-none">
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 font-mono text-[8px] flex items-center justify-center px-0.5 leading-none" style={{ backgroundColor: "#E84530", color: "#F5F5F5" }}>
                 {itemCount}
               </span>
             )}
@@ -165,9 +205,9 @@ export default function Nav() {
 
           {/* Hamburger — mobile */}
           <button onClick={() => setMobileOpen(v => !v)} className="flex md:hidden flex-col gap-1.5 p-1" aria-label={mobileOpen ? 'Close menu' : 'Open menu'}>
-            <span className={`block w-5 h-px bg-sl-white transition-all duration-200 ${mobileOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
-            <span className={`block w-5 h-px bg-sl-white transition-all duration-200 ${mobileOpen ? 'opacity-0' : ''}`} />
-            <span className={`block w-5 h-px bg-sl-white transition-all duration-200 ${mobileOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+            <span className={`block w-5 h-px transition-all duration-200 ${mobileOpen ? 'rotate-45 translate-y-[7px]' : ''}`} style={{ backgroundColor: 'var(--color-text)' }} />
+            <span className={`block w-5 h-px transition-all duration-200 ${mobileOpen ? 'opacity-0' : ''}`} style={{ backgroundColor: 'var(--color-text)' }} />
+            <span className={`block w-5 h-px transition-all duration-200 ${mobileOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} style={{ backgroundColor: 'var(--color-text)' }} />
           </button>
         </div>
       </nav>
@@ -175,22 +215,22 @@ export default function Nav() {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-20 pt-16 md:hidden">
-          <div className="absolute inset-0 bg-[rgba(8,8,8,0.97)]" onClick={() => setMobileOpen(false)} />
-          <nav className="relative z-10 border-b border-sl-border bg-sl-darker">
+          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(var(--color-bg-rgb), 0.97)' }} onClick={() => setMobileOpen(false)} />
+          <nav className="relative z-10 border-b border-sl-border" style={{ backgroundColor: 'var(--color-bg)' }}>
             <ul className="list-none px-5 py-4 flex flex-col gap-0.5">
               {NAV_LINKS.map(link => (
                 <li key={link.href}>
-                  <Link href={link.href} onClick={() => setMobileOpen(false)} className="block py-3 font-mono text-[11px] tracking-[0.12em] uppercase text-sl-mid no-underline hover:text-sl-white border-b border-sl-border transition-colors">
+                  <Link href={link.href} onClick={() => setMobileOpen(false)} className="block py-3 font-mono text-[11px] tracking-[0.12em] uppercase no-underline border-b border-sl-border transition-colors" style={{ color: 'var(--color-text-muted)' }} onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}>
                     {link.label}
                   </Link>
                 </li>
               ))}
               {user ? (
                 <>
-                  <li><Link href="/library" onClick={() => setMobileOpen(false)} className="block py-3 font-mono text-[11px] tracking-[0.12em] uppercase text-sl-mid no-underline hover:text-sl-white border-b border-sl-border transition-colors">Library</Link></li>
-                  <li><Link href="/account" onClick={() => setMobileOpen(false)} className="block py-3 font-mono text-[11px] tracking-[0.12em] uppercase text-sl-mid no-underline hover:text-sl-white border-b border-sl-border transition-colors">Account Settings</Link></li>
-                  <li><Link href="/account/orders" onClick={() => setMobileOpen(false)} className="block py-3 font-mono text-[11px] tracking-[0.12em] uppercase text-sl-mid no-underline hover:text-sl-white border-b border-sl-border transition-colors">Order History</Link></li>
-                  <li><button onClick={handleSignOut} className="w-full text-left py-3 font-mono text-[11px] tracking-[0.12em] uppercase text-sl-muted hover:text-sl-white transition-colors">Sign Out</button></li>
+                  <li><Link href="/library" onClick={() => setMobileOpen(false)} className="block py-3 font-mono text-[11px] tracking-[0.12em] uppercase no-underline border-b border-sl-border transition-colors" style={{ color: 'var(--color-text-muted)' }} onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}>Library</Link></li>
+                  <li><Link href="/account" onClick={() => setMobileOpen(false)} className="block py-3 font-mono text-[11px] tracking-[0.12em] uppercase no-underline border-b border-sl-border transition-colors" style={{ color: 'var(--color-text-muted)' }} onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}>Account Settings</Link></li>
+                  <li><Link href="/account/orders" onClick={() => setMobileOpen(false)} className="block py-3 font-mono text-[11px] tracking-[0.12em] uppercase no-underline border-b border-sl-border transition-colors" style={{ color: 'var(--color-text-muted)' }} onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}>Order History</Link></li>
+                  <li><button onClick={handleSignOut} className="w-full text-left py-3 font-mono text-[11px] tracking-[0.12em] uppercase transition-colors" style={{ color: 'var(--color-text-muted)' }} onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}>Sign Out</button></li>
                 </>
               ) : (
                 <li><Link href="/auth" onClick={() => setMobileOpen(false)} className="block mt-3 text-center bg-sl-orange text-sl-white px-4 py-3 font-mono text-[10px] tracking-[0.12em] uppercase no-underline">Sign In</Link></li>

@@ -13,21 +13,21 @@ export default function Capabilities() {
       <div className="max-w-[1120px] mx-auto px-5 sm:px-8 md:px-12">
         <Reveal className="mb-10 sm:mb-14">
           <span className="block font-mono text-[10px] tracking-[0.2em] uppercase text-sl-orange mb-3.5">03 — What We Do</span>
-          <h2 className="font-syne font-extrabold text-sl-white leading-[1.05] tracking-tight" style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}>
+          <h2 className="font-syne font-extrabold leading-[1.05] tracking-tight" style={{ fontSize: 'clamp(28px, 4vw, 52px)', color: 'var(--color-text)' }}>
             Capabilities.
           </h2>
         </Reveal>
         <Reveal delay={80}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5">
             {CAPS.map(cap => (
-              <div key={cap.num} className="flex gap-5 bg-sl-darker border border-sl-border p-6 sm:p-8 transition-colors duration-200 hover:border-[rgba(232,69,48,0.3)]">
-                <span className="font-mono text-[10px] text-sl-border flex-shrink-0 pt-0.5 tracking-[0.05em]">{cap.num}</span>
+              <div key={cap.num} className="flex gap-5 border border-sl-border p-6 sm:p-8 transition-colors duration-200 hover:border-[rgba(232,69,48,0.3)]" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <span className="font-mono text-[10px] flex-shrink-0 pt-0.5 tracking-[0.05em]" style={{ color: 'var(--color-border)' }}>{cap.num}</span>
                 <div>
-                  <h3 className="font-syne font-bold text-[15px] sm:text-[17px] text-sl-white mb-2">{cap.title}</h3>
-                  <p className="text-[13px] text-sl-muted leading-relaxed">{cap.desc}</p>
+                  <h3 className="font-syne font-bold text-[15px] sm:text-[17px] mb-2" style={{ color: 'var(--color-text)' }}>{cap.title}</h3>
+                  <p className="text-[13px] leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>{cap.desc}</p>
                   <div className="flex flex-wrap gap-1.5 mt-3.5">
                     {cap.tags.map(t => (
-                      <span key={t} className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted border border-sl-border px-2 py-0.5">{t}</span>
+                      <span key={t} className="font-mono text-[9px] tracking-[0.1em] uppercase border border-sl-border px-2 py-0.5" style={{ color: 'var(--color-text-muted)' }}>{t}</span>
                     ))}
                   </div>
                 </div>

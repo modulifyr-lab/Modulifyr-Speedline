@@ -1,3 +1,5 @@
+'use client'
+
 // ─── Hero.tsx ────────────────────────────────────────────────────────────────
 import Link from 'next/link'
 
@@ -23,14 +25,14 @@ export function Hero() {
         </div>
 
         <h1 className="font-syne font-extrabold leading-[0.93] tracking-[-0.03em] animate-fadeUp2" style={{ fontSize: 'clamp(44px, 9.5vw, 116px)' }}>
-          <span className="block text-sl-white">Desktop Games.</span>
-          <span className="block" style={{ color: 'transparent', WebkitTextStroke: '1px rgba(245,245,245,0.2)' }}>
+          <span className="block" style={{ color: 'var(--color-text)' }}>Desktop Games.</span>
+          <span className="block" style={{ color: 'transparent', WebkitTextStroke: '1px var(--color-text-stroke)' }}>
             Built{' '}<span style={{ color: '#E84530', WebkitTextStroke: '0' }}>Right.</span>
           </span>
         </h1>
 
         <div className="grid gap-8 md:gap-12 mt-10 sm:mt-14 pt-7 sm:pt-9 border-t border-sl-border animate-fadeUp3" style={{ gridTemplateColumns: '1fr' }}>
-          <p className="max-w-[460px] text-sl-light text-[14px] sm:text-[15px] leading-[1.7]">
+          <p className="max-w-[460px]" style={{ color: 'var(--color-text-secondary)' }} className="text-[14px] sm:text-[15px] leading-[1.7]">
             Speedline is the game development division of Modulifyr. Desktop games for Windows, Mac, and Linux — shipped on Steam and sold directly. Same engineering discipline. Different product.
           </p>
           <div className="flex flex-row sm:flex-col items-start sm:items-end gap-3">
@@ -40,7 +42,10 @@ export function Hero() {
               <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
             <Link href="/#about"
-              className="inline-flex items-center gap-2 text-sl-mid font-mono text-[10px] tracking-[0.12em] uppercase no-underline pb-2.5 border-b border-sl-border transition-colors duration-200 hover:text-sl-white hover:border-sl-mid">
+              className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] uppercase no-underline pb-2.5 border-b border-sl-border transition-colors duration-200"
+              style={{ color: 'var(--color-text-muted)' }}
+              onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text)'}
+              onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text-muted)'}>
               About the Studio →
             </Link>
           </div>
@@ -53,10 +58,10 @@ export function Hero() {
             { val: '0', sup: '×', label: 'Crunch Culture' },
           ].map(k => (
             <div key={k.label}>
-              <div className="font-syne font-extrabold text-[22px] sm:text-[26px] text-sl-white leading-none">
+              <div className="font-syne font-extrabold text-[22px] sm:text-[26px] leading-none" style={{ color: 'var(--color-text)' }}>
                 {k.val}<span className="text-sl-orange">{k.sup}</span>
               </div>
-              <div className="font-mono text-[9px] tracking-[0.15em] uppercase text-sl-muted mt-1">{k.label}</div>
+              <div className="font-mono text-[9px] tracking-[0.15em] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>{k.label}</div>
             </div>
           ))}
         </div>

@@ -31,12 +31,12 @@ export default function GamesPage() {
             Modulifyr Speedline — Shop
           </span>
           <h1
-            className="font-syne font-extrabold text-sl-white leading-[0.95] tracking-tight mb-5"
-            style={{ fontSize: 'clamp(44px, 7vw, 88px)' }}
+            className="font-syne font-extrabold leading-[0.95] tracking-tight mb-5"
+            style={{ fontSize: 'clamp(44px, 7vw, 88px)', color: 'var(--color-text)' }}
           >
             All Games.
           </h1>
-          <p className="text-sl-light text-[15px] max-w-[520px] leading-[1.7]">
+          <p className="text-[15px] max-w-[520px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
             Our full catalog — available on Steam and direct purchase.
             Use the filter to find games by status.
           </p>
@@ -51,7 +51,7 @@ export default function GamesPage() {
       </section>
 
       {/* Press & info strip */}
-      <section className="relative z-10 border-t border-sl-border bg-sl-surface py-12">
+      <section className="relative z-10 border-t border-sl-border py-12" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="max-w-[1120px] mx-auto px-12">
           <div className="grid grid-cols-3 gap-0.5">
             {[
@@ -67,13 +67,13 @@ export default function GamesPage() {
               },
               {
                 heading: 'Refunds',
-                body:    'Direct purchases are eligible for refunds within 14 days of purchase, no questions asked.',
+                body:    'Direct purchases are eligible for refunds within 48 hours of purchase, no questions asked.',
                 action:  { label: 'Contact Support', href: 'mailto:support@modulifyr.com' },
               },
             ].map(item => (
-              <div key={item.heading} className="bg-sl-darker border border-sl-border p-7">
-                <h3 className="font-syne font-bold text-[15px] text-sl-white mb-2">{item.heading}</h3>
-                <p className="text-[13px] text-sl-muted leading-relaxed mb-4">{item.body}</p>
+              <div key={item.heading} className="border border-sl-border p-7" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <h3 className="font-syne font-bold text-[15px] mb-2" style={{ color: 'var(--color-text)' }}>{item.heading}</h3>
+                <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'var(--color-text-muted)' }}>{item.body}</p>
                 <a
                   href={item.action.href}
                   className="font-mono text-[9px] tracking-[0.12em] uppercase text-sl-orange no-underline hover:underline"

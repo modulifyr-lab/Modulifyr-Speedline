@@ -41,8 +41,11 @@ export default function GamesFilter({ games }: GamesFilterProps) {
               border transition-colors duration-200 cursor-pointer
               ${active === f.value
                 ? 'bg-sl-orange text-sl-white border-sl-orange'
-                : 'bg-transparent text-sl-muted border-sl-border hover:border-sl-mid hover:text-sl-light'}
+                : 'bg-transparent border-sl-border hover:border-sl-mid'}
             `}
+            style={{ color: active === f.value ? undefined : 'var(--color-text-muted)' }}
+            onMouseEnter={(e) => { if (active !== f.value) e.currentTarget.style.color = 'var(--color-text-secondary)' }}
+            onMouseLeave={(e) => { if (active !== f.value) e.currentTarget.style.color = 'var(--color-text-muted)' }}
           >
             {f.label}
             {f.value !== 'all' && (
@@ -50,7 +53,7 @@ export default function GamesFilter({ games }: GamesFilterProps) {
             )}
           </button>
         ))}
-        <span className="ml-auto font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted">
+        <span className="ml-auto font-mono text-[9px] tracking-[0.1em] uppercase" style={{ color: 'var(--color-text-muted)' }}>
           {filtered.length} {filtered.length === 1 ? 'title' : 'titles'}
         </span>
       </div>
@@ -67,8 +70,8 @@ export default function GamesFilter({ games }: GamesFilterProps) {
           ))}
         </div>
       ) : (
-        <div className="border border-sl-border bg-sl-surface py-20 text-center">
-          <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-sl-muted">
+        <div className="border border-sl-border py-20 text-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <p className="font-mono text-[10px] tracking-[0.15em] uppercase" style={{ color: 'var(--color-text-muted)' }}>
             No titles in this category yet.
           </p>
         </div>

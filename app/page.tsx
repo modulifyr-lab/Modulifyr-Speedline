@@ -1,3 +1,4 @@
+'use client'
 import Nav          from '@/components/Nav'
 import Hero         from '@/components/Hero'
 import Marquee      from '@/components/Marquee'
@@ -32,13 +33,13 @@ export default function Home() {
                   01 — Games & Shop
                 </span>
                 <h2
-                  className="font-syne font-extrabold text-sl-white leading-[1.05] tracking-tight"
-                  style={{ fontSize: 'clamp(34px, 4vw, 52px)' }}
+                  className="font-syne font-extrabold leading-[1.05] tracking-tight"
+                  style={{ fontSize: 'clamp(34px, 4vw, 52px)', color: 'var(--color-text)' }}
                 >
                   Our Games.
                 </h2>
               </div>
-              <div className="text-right font-mono text-[10px] tracking-[0.1em] uppercase text-sl-muted leading-[1.9]">
+              <div className="text-right font-mono text-[10px] tracking-[0.1em] uppercase leading-[1.9]" style={{ color: 'var(--color-text-muted)' }}>
                 Steam + Direct Purchase<br />
                 Windows · Mac · Linux
               </div>
@@ -58,10 +59,18 @@ export default function Home() {
             <div className="mt-8 flex justify-center">
               <Link
                 href="/games"
-                className="inline-flex items-center gap-2.5 border border-sl-border text-sl-mid
+                className="inline-flex items-center gap-2.5 border border-sl-border
                            px-7 py-3 font-mono text-[10px] tracking-[0.12em] uppercase
-                           no-underline transition-colors duration-200
-                           hover:border-sl-orange hover:text-sl-white"
+                           no-underline transition-colors duration-200"
+                style={{ color: 'var(--color-text-muted)' }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text)';
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--color-sl-orange)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text-muted)';
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--color-border)';
+                }}
               >
                 View Full Catalog →
               </Link>
