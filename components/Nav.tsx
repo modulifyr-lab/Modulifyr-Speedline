@@ -24,7 +24,7 @@ export default function Nav() {
   const router   = useRouter()
   const { user, signOut }          = useAuth()
   const { itemCount, openCart }    = useCart()
-  const { theme, setTheme, resolvedTheme } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
 
   const [scrolled,      setScrolled]      = useState(false)
   const [accountOpen,   setAccountOpen]   = useState(false)

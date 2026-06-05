@@ -32,7 +32,7 @@ export function Hero() {
         </h1>
 
         <div className="grid gap-8 md:gap-12 mt-10 sm:mt-14 pt-7 sm:pt-9 border-t border-sl-border animate-fadeUp3" style={{ gridTemplateColumns: '1fr' }}>
-          <p className="max-w-[460px]" style={{ color: 'var(--color-text-secondary)' }} className="text-[14px] sm:text-[15px] leading-[1.7]">
+          <p className="max-w-[460px] text-[14px] sm:text-[15px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
             Speedline is the game development division of Modulifyr. Desktop games for Windows, Mac, and Linux — shipped on Steam and sold directly. Same engineering discipline. Different product.
           </p>
           <div className="flex flex-row sm:flex-col items-start sm:items-end gap-3">
