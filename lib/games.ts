@@ -63,11 +63,11 @@ export const games: Game[] = [
     steamUrl:      null,
     directUrl:     null,
     featured:      true,
-    icon:          '🚀',  
+    icon:          'banjhakri.png',  
     artGradient:   'linear-gradient(135deg, #1a0d0a 0%, #1C1C1C 100%)',
     engine:        'Unity',
     trailerUrl:    null,
-    screenshots:   [],
+    screenshots:   ['/banjhakri.png'],
     tags:          ['action', 'adventure', 'spiritual', 'multiplayer-planned'],
     dlcs:          [],
     systemRequirements: {

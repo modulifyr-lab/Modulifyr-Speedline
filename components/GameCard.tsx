@@ -63,17 +63,13 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
           className={`relative w-full flex-shrink-0 overflow-hidden ${featured ? 'aspect-[16/7]' : 'aspect-video'}`}
           style={{ background: game.artGradient }}
         >
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span
-              className="select-none"
-              style={{ fontSize: featured ? '72px' : '52px', color: 'var(--color-border)' }}
-              aria-hidden="true"
-            >
-              {game.icon}
-            </span>
-            <span className="absolute bottom-3 right-3.5 font-mono text-[9px] tracking-[0.15em] uppercase select-none" style={{ color: 'var(--color-border)' }}>
-              Cover Art
-            </span>
+          <div className="absolute inset-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`/${game.icon}`}
+              alt={`${game.title} cover art`}
+              className="w-full h-full object-cover"
+            />
           </div>
 
           {/* Status badge */}

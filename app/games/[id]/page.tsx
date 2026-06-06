@@ -35,11 +35,13 @@ export default function GameDetailPage({ params }: Props) {
         className="relative w-full overflow-hidden border-b border-sl-border"
         style={{ background: game.artGradient, minHeight: '280px', marginTop: '64px' }}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[100px] select-none" aria-hidden="true">{game.icon}</span>
-          <span className="absolute bottom-4 right-6 font-mono text-[9px] tracking-[0.15em] uppercase text-sl-border">
-            Cover Art Placeholder
-          </span>
+        <div className="absolute inset-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`/${game.icon}`}
+            alt={`${game.title} cover art`}
+            className="w-full h-full object-cover"
+          />
         </div>
         {/* Status + platforms */}
         <div className="absolute top-4 left-5 sm:left-6 flex items-center gap-2 flex-wrap">
