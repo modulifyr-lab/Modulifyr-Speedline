@@ -11,7 +11,7 @@ export default function RefundPage() {
     <LegalLayout
       title="Refund Policy"
       subtitle="Our refund terms and what permanent game ownership means for you."
-      lastUpdated="May 2026"
+      lastUpdated="June 2026"
     >
       <Section title="What Permanent Ownership Means">
         <P>
@@ -81,7 +81,7 @@ export default function RefundPage() {
         </ul>
         <P>
           We will process the refund and respond within 2 business days. Refunds are returned
-          to the original payment method via Stripe. Processing times depend on your bank
+          to the original payment method via Paddle. Processing times depend on your bank
           or card provider and are typically 5–10 business days after we issue the refund.
         </P>
         <P>

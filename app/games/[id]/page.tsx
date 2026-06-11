@@ -1,10 +1,12 @@
 import type { Metadata }    from 'next'
 import { notFound }          from 'next/navigation'
+import Image                 from 'next/image'
 import Nav                   from '@/components/Nav'
 import Footer                from '@/components/Footer'
 import BuyButton             from '@/components/BuyButton'
 import WishlistButton        from '@/components/WishlistButton'
-import { getGameById, PLATFORM_LABELS, STATUS_LABELS } from '@/lib/games'
+import NotifyButton          from '@/components/NotifyButton'
+import { getGameById, PLATFORM_LABELS, STATUS_LABELS, isIconFile } from '@/lib/games'
 
 interface Props { params: { id: string } }
 
@@ -14,6 +16,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title:       `${game.title} — Modulifyr Speedline`,
     description: game.description,
+    openGraph: {
+      title:       `${game.title} — Modulifyr Speedline`,
+      description: game.description,
+      images: isIconFile(game.icon)
+        ? [{ url: `/${game.icon}`, width: 1200, height: 630, alt: `${game.title} cover art` }]
+        : [],
+    },
   }
 }
 
@@ -35,14 +44,21 @@ export default function GameDetailPage({ params }: Props) {
         className="relative w-full overflow-hidden border-b border-sl-border"
         style={{ background: game.artGradient, minHeight: '280px', marginTop: '64px' }}
       >
-        <div className="absolute inset-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+        {isIconFile(game.icon) ? (
+          <Image
             src={`/${game.icon}`}
             alt={`${game.title} cover art`}
-            className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
           />
-        </div>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-[120px] select-none opacity-20" aria-hidden="true">
+            {game.icon}
+          </div>
+        )}
+
         {/* Status + platforms */}
         <div className="absolute top-4 left-5 sm:left-6 flex items-center gap-2 flex-wrap">
           <span className="font-mono text-[9px] tracking-[0.12em] uppercase px-2 py-1 bg-[rgba(8,8,8,0.75)] border border-sl-border text-sl-orange">
@@ -124,13 +140,15 @@ export default function GameDetailPage({ params }: Props) {
                   <SectionLabel>Screenshots</SectionLabel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5">
                     {game.screenshots!.map((src, i) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        key={i}
-                        src={src}
-                        alt={`${game.title} screenshot ${i + 1}`}
-                        className="w-full aspect-video object-cover border border-sl-border"
-                      />
+                      <div key={i} className="relative aspect-video border border-sl-border overflow-hidden">
+                        <Image
+                          src={src}
+                          alt={`${game.title} screenshot ${i + 1}`}
+                          fill
+                          sizes="(max-width: 640px) 100vw, 50vw"
+                          className="object-cover"
+                        />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -141,7 +159,7 @@ export default function GameDetailPage({ params }: Props) {
                 <div className="mb-10">
                   <SectionLabel>System Requirements</SectionLabel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5">
-                    <SysReqColumn label="Minimum" spec={game.systemRequirements!.minimum} />
+                    <SysReqColumn label="Minimum"     spec={game.systemRequirements!.minimum}     />
                     <SysReqColumn label="Recommended" spec={game.systemRequirements!.recommended} />
                   </div>
                 </div>
@@ -202,14 +220,23 @@ export default function GameDetailPage({ params }: Props) {
                   )}
                 </div>
 
-                {/* Buy button — Add to Cart + Buy Now */}
+                {/* Buy button or Notify button */}
                 <div className="mb-5">
-                  <BuyButton
-                    item={game}
-                    itemType="game"
-                    artGradient={game.artGradient}
-                    showBothActions
-                  />
+                  {isAvailable ? (
+                    <BuyButton
+                      item={game}
+                      itemType="game"
+                      artGradient={game.artGradient}
+                      showBothActions
+                    />
+                  ) : (
+                    <div id="notify">
+                      <NotifyButton gameId={game.id} size="md" />
+                      <p className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted mt-2">
+                        Get notified when this game launches.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Wishlist */}
@@ -217,21 +244,23 @@ export default function GameDetailPage({ params }: Props) {
                   <WishlistButton gameId={game.id} size="md" />
                 </div>
 
-                {/* What's included */}
-                <div className="flex flex-col gap-2 pt-4 border-t border-sl-border">
-                  {[
-                    'Permanent access — no expiry',
-                    'All future patches included',
-                    'No DRM on direct purchase',
-                    'Download immediately after purchase',
-                    'Playable after studio closure',
-                  ].map(line => (
-                    <div key={line} className="flex items-start gap-2">
-                      <CheckCyan />
-                      <span className="font-mono text-[9px] text-sl-muted leading-relaxed">{line}</span>
-                    </div>
-                  ))}
-                </div>
+                {/* What's included — only show for available games */}
+                {isAvailable && (
+                  <div className="flex flex-col gap-2 pt-4 border-t border-sl-border">
+                    {[
+                      'Permanent access — no expiry',
+                      'All future patches included',
+                      'No DRM on direct purchase',
+                      'Download immediately after purchase',
+                      'Playable after studio closure',
+                    ].map(line => (
+                      <div key={line} className="flex items-start gap-2">
+                        <CheckCyan />
+                        <span className="font-mono text-[9px] text-sl-muted leading-relaxed">{line}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Steam link */}
                 {game.steamUrl && (

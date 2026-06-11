@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react'
 import { useRouter }           from 'next/navigation'
 import Link                    from 'next/link'
+import Image                   from 'next/image'
 import Nav                     from '@/components/Nav'
 import Footer                  from '@/components/Footer'
 import { useAuth }             from '@/contexts/AuthContext'
 import { getUserLibrary }      from '@/lib/purchases'
-import { getGameById }         from '@/lib/games'
+import { getGameById, isIconFile } from '@/lib/games'
 import type { LibraryEntry }   from '@/lib/purchases'
 
 export default function OrderHistoryPage() {
@@ -25,7 +26,6 @@ export default function OrderHistoryPage() {
     if (!user) return
     getUserLibrary(user.uid)
       .then(entries => {
-        // Sort newest first
         const sorted = [...entries].sort((a, b) => b.purchasedAt.seconds - a.purchasedAt.seconds)
         setOrders(sorted)
       })
@@ -38,7 +38,6 @@ export default function OrderHistoryPage() {
     </div>
   )
 
-  // Group orders by Stripe session (cart purchases appear as one order)
   const grouped = groupBySession(orders)
 
   return (
@@ -95,7 +94,7 @@ export default function OrderHistoryPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-mono text-[9px] tracking-[0.12em] uppercase text-sl-muted">Session ID</p>
+                        <p className="font-mono text-[9px] tracking-[0.12em] uppercase text-sl-muted">Transaction ID</p>
                         <p className="font-mono text-[9px] text-sl-border mt-0.5 truncate max-w-[180px]">
                           {order.sessionId}
                         </p>
@@ -107,29 +106,48 @@ export default function OrderHistoryPage() {
                       const game = getGameById(entry.type === 'dlc' ? (entry.parentGameId ?? '') : entry.gameId)
                       return (
                         <div key={entry.gameId} className="flex items-center gap-4 px-6 py-4 border-b border-sl-border last:border-b-0">
+                          {/* Art thumbnail */}
                           <div
-                            className="w-10 h-10 flex-shrink-0 flex items-center justify-center text-lg border border-sl-border"
+                            className="relative w-10 h-10 flex-shrink-0 border border-sl-border overflow-hidden"
                             style={{ background: game?.artGradient ?? '#141414' }}
                             aria-hidden="true"
                           >
-                            {game?.icon ?? '🎮'}
+                            {game && isIconFile(game.icon) ? (
+                              <Image
+                                src={`/${game.icon}`}
+                                alt={game.title}
+                                fill
+                                sizes="40px"
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-lg">
+                                {game?.icon ?? '🎮'}
+                              </div>
+                            )}
                           </div>
+
                           <div className="flex-1 min-w-0">
                             <p className="font-syne font-bold text-[13px] text-sl-white truncate">{entry.title}</p>
                             <p className="font-mono text-[9px] tracking-[0.08em] uppercase text-sl-muted">
                               {entry.type === 'dlc' ? 'DLC' : 'Game'} · Permanent license
                             </p>
                           </div>
+
                           <div className="flex items-center gap-2 flex-shrink-0">
                             {entry.downloadUrl && (
-                              <a href={entry.downloadUrl}
-                                className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-cyan border border-[rgba(47,184,200,0.3)] px-3 py-1.5 no-underline hover:border-sl-cyan transition-colors">
+                              <a
+                                href={entry.downloadUrl}
+                                className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-cyan border border-[rgba(47,184,200,0.3)] px-3 py-1.5 no-underline hover:border-sl-cyan transition-colors"
+                              >
                                 Download
                               </a>
                             )}
                             {game && (
-                              <Link href={`/games/${game.id}`}
-                                className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted border border-sl-border px-3 py-1.5 no-underline hover:text-sl-white hover:border-sl-mid transition-colors">
+                              <Link
+                                href={`/games/${game.id}`}
+                                className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted border border-sl-border px-3 py-1.5 no-underline hover:text-sl-white hover:border-sl-mid transition-colors"
+                              >
                                 Details
                               </Link>
                             )}

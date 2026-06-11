@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link                             from 'next/link'
-import { searchGames }                  from '@/lib/games'
-import { STATUS_LABELS, PLATFORM_LABELS } from '@/lib/games'
+import Image                            from 'next/image'
+import { searchGames, getGenres }       from '@/lib/games'
+import { STATUS_LABELS, PLATFORM_LABELS, isIconFile } from '@/lib/games'
 import type { Game }                    from '@/lib/games'
 
 interface SearchOverlayProps {
@@ -16,7 +17,9 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const [results, setResults] = useState<Game[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Focus input when opened
+  // Derive genres dynamically from catalog
+  const genres = getGenres()
+
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 50)
@@ -26,7 +29,6 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     }
   }, [isOpen])
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -67,8 +69,8 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             onClick={onClose}
             className="absolute right-4 font-mono text-[9px] tracking-[0.1em] uppercase transition-colors"
             style={{ color: 'var(--color-text-muted)' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text)' }
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)' }
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)'}
             aria-label="Close search"
           >
             ESC
@@ -94,16 +96,26 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   onClick={onClose}
                   className="flex items-center gap-4 px-5 py-4 no-underline transition-colors group"
                   style={{ backgroundColor: 'var(--color-surface)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-surface2)' }
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-surface)' }
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-surface2)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-surface)'}
                 >
                   {/* Thumbnail */}
                   <div
-                    className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-xl border border-sl-border"
+                    className="relative w-12 h-12 flex-shrink-0 border border-sl-border overflow-hidden"
                     style={{ background: game.artGradient }}
                     aria-hidden="true"
                   >
-                    {game.icon}
+                    {isIconFile(game.icon) ? (
+                      <Image
+                        src={`/${game.icon}`}
+                        alt={game.title}
+                        fill
+                        sizes="48px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xl">{game.icon}</div>
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -139,14 +151,14 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             </div>
           )}
 
-          {/* Quick links when no query */}
-          {!query.trim() && (
+          {/* Quick links when no query — derived from live catalog */}
+          {!query.trim() && genres.length > 0 && (
             <div className="border border-sl-border px-5 py-4" style={{ backgroundColor: 'var(--color-surface)' }}>
               <p className="font-mono text-[9px] tracking-[0.12em] uppercase mb-3" style={{ color: 'var(--color-text-muted)' }}>
                 Browse by genre
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {['Arcade Racing', 'Puzzle / Strategy', 'Action Roguelike'].map(genre => (
+                {genres.map(genre => (
                   <button
                     key={genre}
                     onClick={() => handleQuery(genre)}

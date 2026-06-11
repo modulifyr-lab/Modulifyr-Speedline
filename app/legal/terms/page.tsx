@@ -11,7 +11,7 @@ export default function TermsPage() {
     <LegalLayout
       title="Terms of Service"
       subtitle="The rules governing your use of Modulifyr Speedline and your purchased games."
-      lastUpdated="May 2026"
+      lastUpdated="June 2026"
     >
       <Section title="1. Who These Terms Apply To">
         <P>
@@ -109,9 +109,9 @@ export default function TermsPage() {
 
       <Section title="6. Payments">
         <P>
-          All payments are processed by Stripe. Modulifyr Speedline does not store your payment
-          card details. Prices are displayed in USD. Applicable taxes, if any, are the
-          responsibility of the buyer based on their jurisdiction.
+          All payments are processed by Paddle. Modulifyr Speedline does not store your payment
+          card details. Prices are displayed in USD. Applicable taxes, if any, are determined
+          and collected by Paddle as the Merchant of Record based on your jurisdiction.
         </P>
         <P>
           Purchases are final subject to the Refund Policy. Initiating a chargeback outside of

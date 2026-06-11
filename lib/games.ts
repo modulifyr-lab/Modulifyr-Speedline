@@ -17,6 +17,11 @@ export interface DLC {
   price:         number
   paddlePriceId: string
   downloadUrl?:  string | null
+  /**
+   * icon: use a filename (e.g. "dlc-skin.png") that lives in /public,
+   * or an emoji character as a placeholder.
+   * Components must check: icon.includes('.') → render <img>, else render as text.
+   */
   icon?:         string
 }
 
@@ -29,18 +34,26 @@ export interface Game {
   status:          GameStatus
   platforms:       Platform[]
   price:           number | null
+  /**
+   * paddlePriceId: only set once the game has an active Paddle product with a one-time price.
+   * Leave null for in-development / concept games.
+   */
   paddlePriceId:   string | null
   downloadUrl:     string | null
   steamUrl:        string | null
   directUrl:       string | null
   featured:        boolean
+  /**
+   * icon: filename in /public (e.g. "banjhakri.png") or an emoji placeholder.
+   * Components must check: icon.includes('.') → render <img src={/${icon}}, else render as text.
+   */
   icon:            string
   artGradient:     string
   engine:          Engine
   releaseYear?:    string
   tags?:           string[]
   dlcs?:           DLC[]
-  screenshots?:    string[]   // URLs — empty until real art exists
+  screenshots?:    string[]
   trailerUrl?:     string | null
   systemRequirements?: {
     minimum:     SystemSpec
@@ -58,17 +71,20 @@ export const games: Game[] = [
     status:        'in-development',
     platforms:     ['windows', 'mac'],
     price:         null,
-    paddlePriceId: 'pro_01krjz5zf4tkq9wzww2w9ezq2p',
+    // paddlePriceId must be null until game is published and priced in Paddle Catalog.
+    // Add it here (format: pri_...) only when status moves to 'available'.
+    paddlePriceId: null,
     downloadUrl:   null,
     steamUrl:      null,
     directUrl:     null,
     featured:      true,
-    icon:          'banjhakri.png',  
+    // Filename in /public. Components must check icon.includes('.') before rendering as <img>.
+    icon:          'banjhakri.png',
     artGradient:   'linear-gradient(135deg, #1a0d0a 0%, #1C1C1C 100%)',
     engine:        'Unity',
     trailerUrl:    null,
     screenshots:   ['/banjhakri.png'],
-    tags:          ['action', 'adventure', 'spiritual', 'multiplayer-planned'],
+    tags:          ['action', 'adventure', 'folklore', 'nepali', 'top-down'],
     dlcs:          [],
     systemRequirements: {
       minimum: {
@@ -108,6 +124,11 @@ export function searchGames(query: string): Game[] {
   )
 }
 
+/** Unique genres from the live catalog, for use in search chips and filters. */
+export function getGenres(): string[] {
+  return [...new Set(games.map(g => g.genre))].sort()
+}
+
 export const featuredGame = games.find(g => g.featured) ?? games[0]
 
 export const STATUS_LABELS: Record<GameStatus, string> = {
@@ -121,4 +142,15 @@ export const PLATFORM_LABELS: Record<Platform, string> = {
   windows: 'Windows',
   mac:     'Mac',
   linux:   'Linux',
+}
+
+/**
+ * Utility: given a game's icon field, determine whether it is a filename or emoji.
+ * Usage in components:
+ *   isIconFile(game.icon)
+ *     ? <img src={`/${game.icon}`} ... />
+ *     : <span>{game.icon}</span>
+ */
+export function isIconFile(icon: string): boolean {
+  return icon.includes('.')
 }

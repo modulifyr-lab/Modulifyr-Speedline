@@ -2,7 +2,7 @@
 
 Desktop game studio website for Modulifyr Speedline — a division of Modulifyr.
 
-Built with **Next.js 14**, **TypeScript**, and **Tailwind CSS**. Deployable to Vercel.
+Built with **Next.js 14**, **TypeScript**, and **Tailwind CSS v4**. Deployable to Vercel.
 
 ---
 
@@ -10,11 +10,11 @@ Built with **Next.js 14**, **TypeScript**, and **Tailwind CSS**. Deployable to V
 
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS + custom CSS classes
+- **Styling**: Tailwind CSS v4 + custom CSS via `@theme` in `globals.css`
 - **Fonts**: Syne, DM Sans, JetBrains Mono (via `next/font/google`)
-- **Auth**: Firebase Auth
+- **Auth**: Firebase Auth (email/password + Google)
 - **Database**: Firebase Firestore
-- **Payments**: Lemon Squeezy
+- **Payments**: Paddle Billing (chosen over LemonSqueezy — supports Nepal payouts via Wise/PayPal)
 - **Deployment**: Vercel
 
 ---
@@ -22,17 +22,26 @@ Built with **Next.js 14**, **TypeScript**, and **Tailwind CSS**. Deployable to V
 ## Local Development
 
 ```bash
-# Install dependencies
 npm install
-
-# Copy env example and fill in values
-cp .env.example .env.local
-
-# Start dev server
+cp .env.example .env.local   # fill in all values
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Environment Variables
+
+| Variable | Where to get it |
+|---|---|
+| `NEXT_PUBLIC_FIREBASE_*` | Firebase Console → Project Settings → Your apps |
+| `FIREBASE_WEBHOOK_EMAIL` | A dedicated Firebase Auth user for server-side writes |
+| `FIREBASE_WEBHOOK_PASSWORD` | Password for the above user |
+| `PADDLE_API_KEY` | Paddle Dashboard → Developer Tools → Authentication |
+| `PADDLE_WEBHOOK_SECRET` | Paddle Dashboard → Developer Tools → Notifications → your endpoint |
+| `PADDLE_ENVIRONMENT` | `sandbox` for testing, `production` for live |
+| `NEXT_PUBLIC_BASE_URL` | `http://localhost:3000` locally, your domain in production |
 
 ---
 
@@ -41,146 +50,146 @@ Open [http://localhost:3000](http://localhost:3000).
 ```
 modulifyr-speedline/
 ├── app/
-│   ├── layout.tsx              # Root layout (fonts, metadata, SpeedCanvas)
-│   ├── globals.css             # Tailwind directives + custom CSS
-│   ├── page.tsx                # Homepage
-│   ├── auth/page.tsx           # Sign in / sign up page
-│   ├── library/page.tsx        # User's game library (protected)
+│   ├── layout.tsx                  # Root layout
+│   ├── globals.css                 # Tailwind v4 @theme + custom CSS
+│   ├── page.tsx                    # Homepage
+│   ├── auth/page.tsx               # Sign in / sign up
+│   ├── library/page.tsx            # User game library (protected)
+│   ├── account/
+│   │   ├── page.tsx                # Account settings (protected)
+│   │   ├── orders/page.tsx         # Order history (protected)
+│   │   └── wishlist/page.tsx       # Wishlist (protected)
 │   ├── games/
-│   │   ├── page.tsx            # Games shop + catalog
-│   │   └── [id]/page.tsx       # Individual game detail page
+│   │   ├── page.tsx                # Games shop + catalog
+│   │   └── [id]/page.tsx           # Game detail page
 │   ├── legal/
-│   │   ├── LegalLayout.tsx     # Layout for legal pages
-│   │   ├── privacy/page.tsx    # Privacy policy
-│   │   ├── terms/page.tsx      # Terms of service
-│   │   └── refund/page.tsx     # Refund policy
+│   │   ├── LegalLayout.tsx
+│   │   ├── privacy/page.tsx
+│   │   ├── terms/page.tsx
+│   │   └── refund/page.tsx
 │   ├── api/
-│   │   ├── checkout/route.ts   # Stripe checkout API
-│   │   └── webhook/route.ts    # Stripe webhook handler
-│   ├── not-found.tsx           # 404 page
-│   ├── robots.ts               # Robots.txt
-│   └── sitemap.ts              # Sitemap
+│   │   ├── checkout/route.ts       # Paddle checkout API
+│   │   ├── webhook/paddle/route.ts # Paddle webhook handler
+│   │   └── notify/route.ts         # Game launch notification subscriptions
+│   ├── support/page.tsx
+│   ├── not-found.tsx
+│   ├── robots.ts
+│   └── sitemap.ts
 ├── components/
-│   ├── SpeedCanvas.tsx         # Animated background (client)
-│   ├── Reveal.tsx              # Scroll reveal wrapper (client)
-│   ├── Nav.tsx                 # Fixed navigation (client)
-│   ├── Hero.tsx                # Homepage hero
-│   ├── Marquee.tsx             # Scrolling ticker
-│   ├── GameCard.tsx            # Game card with buy/notify (client)
-│   ├── GamesFilter.tsx         # Filter bar for shop page (client)
-│   ├── BuyButton.tsx           # Purchase button with Stripe integration (client)
-│   ├── About.tsx               # Studio about section
-│   ├── Capabilities.tsx        # What we do
-│   ├── Engines.tsx             # Engines + target platforms
-│   ├── Process.tsx             # Dev process steps
-│   ├── CTA.tsx                 # Call to action
-│   └── Footer.tsx              # Site footer
+│   ├── SpeedCanvas.tsx             # Animated background
+│   ├── Reveal.tsx                  # Scroll reveal wrapper
+│   ├── Nav.tsx                     # Navigation
+│   ├── Hero.tsx
+│   ├── Marquee.tsx
+│   ├── GameCard.tsx                # Game card — handles image/emoji icons
+│   ├── GamesFilter.tsx
+│   ├── BuyButton.tsx               # Purchase button (Paddle)
+│   ├── NotifyButton.tsx            # Launch notification subscription
+│   ├── WishlistButton.tsx
+│   ├── CartDrawer.tsx
+│   ├── SearchOverlay.tsx           # Cmd+K search (genre chips derived from catalog)
+│   ├── About.tsx
+│   ├── Capabilities.tsx
+│   ├── Engines.tsx
+│   ├── Process.tsx
+│   ├── CTA.tsx
+│   ├── Footer.tsx
+│   └── ThemeProvider.tsx
 ├── contexts/
-│   └── AuthContext.tsx         # Firebase auth context
+│   ├── AuthContext.tsx
+│   └── CartContext.tsx             # Prunes owned items on auth state change
 ├── lib/
-│   ├── games.ts                # Game data types + seed data
-│   ├── purchases.ts            # Purchase utilities
-│   ├── firebase.ts             # Firebase client config
-│   ├── firebase-server.ts      # Firebase admin config
-│   └── lemonsqueezy.ts         # Lemon Squeezy config
-├── middleware.ts               # Next.js middleware for route protection
+│   ├── games.ts                    # Game data + isIconFile() utility
+│   ├── purchases.ts
+│   ├── wishlist.ts
+│   ├── firebase.ts
+│   ├── firebase-server.ts          # Cached server-side Firestore auth
+│   └── paddle.ts
+├── middleware.ts
 └── public/
-    └── logo.png                # Logo
+    ├── logo.png
+    └── banjhakri.png               # Game cover art
 ```
-
----
-
-## Environment Variables
-
-Copy `.env.example` to `.env.local` and fill in all required values:
-
-- Firebase (client and admin)
-- Lemon Squeezy (API key, store ID, webhook secret)
-- Base URL
-
----
-
-## Deploying to Vercel
-
-1. Push this repo to GitHub (new repo, separate from the main Modulifyr site).
-2. Go to [vercel.com](https://vercel.com) → **Add New Project** → import the repo.
-3. Vercel will auto-detect Next.js. No build config changes needed.
-4. Add all environment variables from `.env.local` to **Project Settings → Environment Variables**.
-5. Set your custom domain in **Project Settings → Domains**.
-   - Recommended: `speedline.modulifyr.com` (add a CNAME to your DNS)
-   - Or a standalone domain like `modulifyrspeedline.com`
 
 ---
 
 ## Adding a New Game
 
-Edit `lib/games.ts` and add a new entry to the `games` array:
+Edit `lib/games.ts`. Key rules:
+
+- `paddlePriceId`: **only set when the game is published and priced in Paddle Catalog** (format: `pri_...`). Leave `null` for `in-development` / `concept` games.
+- `icon`: use a filename in `/public` (e.g. `"mygame.png"`) for real art, or an emoji character as a placeholder. Components use `isIconFile(icon)` to decide whether to render `<Image>` or text — do not mix formats.
+- `price`: set to a number only when `status` is `'available'`. Keep `null` otherwise.
 
 ```ts
 {
-  id:                   'your-game-id',
-  title:                'Your Game Title',
-  genre:                'Genre',
-  description:          'Short description shown on cards.',
-  longDescription:      'Longer description for the game detail page (optional).',
-  status:               'in-development',     // 'available' | 'in-development' | 'concept' | 'coming-soon'
-  platforms:            ['windows'],          // 'windows' | 'mac' | 'linux'
-  price:                null,                 // number (e.g. 14.99) or null for TBD, 0 for free
-  lemonSqueezyVariantId: null,                // Lemon Squeezy variant ID (from Lemon Squeezy dashboard)
-  downloadUrl:          null,                 // Direct download link once shipped
-  steamUrl:             null,                 // string URL or null
-  directUrl:            null,                 // Legacy
-  featured:             false,
-  icon:                 '🎮',                 // Emoji placeholder until real cover art
-  artGradient:          'linear-gradient(135deg, #0a0a1a 0%, #1C1C1C 100%)',
-  engine:               'Unity',              // 'Unity' | 'Unreal Engine' | 'Godot' | 'Custom'
-  releaseYear:          '2025',               // Optional
-  tags:                 ['tag1', 'tag2'],     // Optional
-  dlcs:                 [],                   // Optional DLC array
+  id:            'my-game-id',
+  title:         'My Game',
+  genre:         'Action',
+  description:   'Short description.',
+  status:        'in-development',    // 'available' | 'in-development' | 'concept' | 'coming-soon'
+  platforms:     ['windows'],
+  price:         null,                // set when available
+  paddlePriceId: null,                // set when available + priced in Paddle
+  downloadUrl:   null,
+  steamUrl:      null,
+  directUrl:     null,
+  featured:      false,
+  icon:          'mygame.png',        // or '🎮' emoji placeholder
+  artGradient:   'linear-gradient(135deg, #0a0a1a 0%, #1C1C1C 100%)',
+  engine:        'Unity',
+  tags:          ['action', 'roguelike'],
+  dlcs:          [],
 }
-```
-
-When `status` is `'available'` and `lemonSqueezyVariantId` is set, the buy button will appear automatically.
-
-### Adding DLCs
-
-You can add DLCs to a game by adding entries to the `dlcs` array:
-
-```ts
-dlcs: [
-  {
-    id:                   'your-dlc-id',
-    title:                'DLC Title',
-    description:          'Short description of the DLC.',
-    price:                9.99,
-    lemonSqueezyVariantId: '...',              // From Lemon Squeezy dashboard
-    downloadUrl:          'https://...',       // Optional
-    releaseYear:          '2025',              // Optional
-  }
-]
 ```
 
 ---
 
-## Adding Real Cover Art
+## Deploying to Vercel
 
-Replace the emoji placeholder in `GameCard.tsx` and `app/games/[id]/page.tsx`:
+1. Push repo to GitHub.
+2. Vercel → **Add New Project** → import.
+3. Add all environment variables from `.env.local` to **Project Settings → Environment Variables**.
+4. Set custom domain: `speedline.modulifyr.com` (CNAME to Vercel).
+5. In Paddle Dashboard → Notifications, add your webhook endpoint: `https://speedline.modulifyr.com/api/webhook/paddle`
 
-1. Add your image to `/public/games/<game-id>.jpg`
-2. Update the components to use `next/image`
+---
+
+## Firestore Security Rules
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid}/library/{item} {
+      allow read:  if request.auth.uid == uid;
+      allow write: if request.auth.uid == 'WEBHOOK_USER_UID';
+    }
+    match /users/{uid}/wishlist/{gameId} {
+      allow read, write: if request.auth.uid == uid;
+    }
+    match /gameNotifications/{gameId}/subscribers/{uid} {
+      allow read:  if request.auth.uid == uid;
+      allow write: if request.auth.uid == uid
+                   || request.auth.uid == 'WEBHOOK_USER_UID';
+    }
+  }
+}
+```
+
+Replace `WEBHOOK_USER_UID` with the UID of your `FIREBASE_WEBHOOK_EMAIL` user (visible in Firebase Console → Authentication).
 
 ---
 
 ## Brand
 
-This site follows the Modulifyr brand guide:
 - **Colors**: Orange `#E84530`, Blue `#2B7FA8`, Amber `#F5B52E`, Cyan `#2FB8C8`
-- **Fonts**: Syne (headings), DM Sans (body), JetBrains Mono (labels)
-- All brand tokens are prefixed `sl-` in `tailwind.config.ts`
+- **Fonts**: Syne (headings), DM Sans (body), JetBrains Mono (labels/mono)
+- All brand tokens are defined in `globals.css` under `@theme`
 
 ---
 
-## Future Pages to Add
+## Future Pages
 
-- `/press` — Press kit and media downloads  
+- `/press` — Press kit and media downloads
 - `/blog` — Dev log / studio updates

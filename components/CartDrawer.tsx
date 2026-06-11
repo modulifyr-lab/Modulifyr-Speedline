@@ -2,8 +2,10 @@
 
 import { useState }  from 'react'
 import { useRouter } from 'next/navigation'
+import Image         from 'next/image'
 import { useCart }   from '@/contexts/CartContext'
 import { useAuth }   from '@/contexts/AuthContext'
+import { isIconFile } from '@/lib/games'
 
 export default function CartDrawer() {
   const { items, itemCount, total, removeItem, clearCart, isOpen, closeCart } = useCart()
@@ -87,8 +89,8 @@ export default function CartDrawer() {
             onClick={closeCart}
             className="transition-colors p-1"
             style={{ color: 'var(--color-text-muted)' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text)' }
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)' }
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)'}
             aria-label="Close cart"
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -123,13 +125,23 @@ export default function CartDrawer() {
             <ul className="divide-y divide-sl-border">
               {items.map(item => (
                 <li key={item.id} className="flex items-center gap-4 px-6 py-4">
-                  {/* Art thumbnail */}
+                  {/* Art thumbnail — handle filename vs emoji */}
                   <div
-                    className="w-14 h-14 flex-shrink-0 flex items-center justify-center text-xl border border-sl-border"
+                    className="relative w-14 h-14 flex-shrink-0 border border-sl-border overflow-hidden"
                     style={{ background: item.artGradient }}
                     aria-hidden="true"
                   >
-                    {item.icon}
+                    {isIconFile(item.icon) ? (
+                      <Image
+                        src={`/${item.icon}`}
+                        alt={item.title}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xl">{item.icon}</div>
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -147,8 +159,8 @@ export default function CartDrawer() {
                       onClick={() => removeItem(item.id)}
                       className="transition-colors"
                       style={{ color: 'var(--color-text-muted)' }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#E84530' }
-                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)' }
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#E84530'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)'}
                       aria-label={`Remove ${item.title}`}
                     >
                       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -183,7 +195,6 @@ export default function CartDrawer() {
               </span>
             </div>
 
-            {/* Promo code note */}
             <p className="font-mono text-[8px] tracking-[0.1em] uppercase mb-3" style={{ color: 'var(--color-text-muted)' }}>
               Promo codes can be applied at checkout.
             </p>
@@ -204,8 +215,8 @@ export default function CartDrawer() {
               onClick={clearCart}
               className="w-full mt-2 font-mono text-[9px] tracking-[0.1em] uppercase transition-colors py-2"
               style={{ color: 'var(--color-text-muted)' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text)' }
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)' }
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-muted)'}
             >
               Clear cart
             </button>

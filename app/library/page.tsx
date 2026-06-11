@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link   from 'next/link'
-import Nav    from '@/components/Nav'
-import Footer from '@/components/Footer'
-import { useAuth }         from '@/contexts/AuthContext'
-import { getUserLibrary, LibraryEntry } from '@/lib/purchases'
-import { getGameById }     from '@/lib/games'
+import { useRouter, useSearchParams }     from 'next/navigation'
+import Link                               from 'next/link'
+import Image                              from 'next/image'
+import Nav                                from '@/components/Nav'
+import Footer                             from '@/components/Footer'
+import { useAuth }                        from '@/contexts/AuthContext'
+import { getUserLibrary, LibraryEntry }   from '@/lib/purchases'
+import { getGameById, isIconFile }        from '@/lib/games'
 
 function LibraryContent() {
   const { user, loading, signOut } = useAuth()
@@ -16,15 +17,13 @@ function LibraryContent() {
   const justPurchased = searchParams.get('success') === '1'
   const newItemId     = searchParams.get('item')
 
-  const [library,    setLibrary]    = useState<LibraryEntry[]>([])
-  const [fetching,   setFetching]   = useState(true)
+  const [library,  setLibrary]  = useState<LibraryEntry[]>([])
+  const [fetching, setFetching] = useState(true)
 
-  // Redirect if not signed in
   useEffect(() => {
     if (!loading && !user) router.replace('/auth?next=/library')
   }, [user, loading, router])
 
-  // Fetch library
   useEffect(() => {
     if (!user) return
     getUserLibrary(user.uid)
@@ -64,9 +63,7 @@ function LibraryContent() {
             </div>
             <button
               onClick={signOut}
-              className="font-mono text-[9px] tracking-[0.12em] uppercase text-sl-muted
-                         border border-sl-border px-4 py-2 hover:border-sl-mid hover:text-sl-white
-                         transition-colors duration-200"
+              className="font-mono text-[9px] tracking-[0.12em] uppercase text-sl-muted border border-sl-border px-4 py-2 hover:border-sl-mid hover:text-sl-white transition-colors duration-200"
             >
               Sign Out
             </button>
@@ -107,12 +104,9 @@ function LibraryContent() {
             <EmptyLibrary />
           ) : (
             <>
-              {/* Games */}
               {games.length > 0 && (
                 <div className="mb-12">
-                  <h2 className="font-syne font-bold text-[20px] text-sl-white mb-1">
-                    Games
-                  </h2>
+                  <h2 className="font-syne font-bold text-[20px] text-sl-white mb-1">Games</h2>
                   <p className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted mb-6">
                     {games.length} {games.length === 1 ? 'title' : 'titles'} owned
                   </p>
@@ -124,12 +118,9 @@ function LibraryContent() {
                 </div>
               )}
 
-              {/* DLCs */}
               {dlcs.length > 0 && (
                 <div>
-                  <h2 className="font-syne font-bold text-[20px] text-sl-white mb-1">
-                    DLC
-                  </h2>
+                  <h2 className="font-syne font-bold text-[20px] text-sl-white mb-1">DLC</h2>
                   <p className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted mb-6">
                     {dlcs.length} {dlcs.length === 1 ? 'item' : 'items'} owned
                   </p>
@@ -162,8 +153,6 @@ export default function LibraryPage() {
   )
 }
 
-
-
 function LibraryCard({ entry, isDLC = false }: { entry: LibraryEntry; isDLC?: boolean }) {
   const game         = getGameById(isDLC ? (entry.parentGameId ?? '') : entry.gameId)
   const purchaseDate = entry.purchasedAt.toDate().toLocaleDateString('en-US', {
@@ -171,16 +160,27 @@ function LibraryCard({ entry, isDLC = false }: { entry: LibraryEntry; isDLC?: bo
   })
 
   return (
-    <div className="flex items-center justify-between gap-6 bg-sl-surface border border-sl-border px-6 py-5
-                    transition-colors duration-200 hover:border-[rgba(232,69,48,0.3)]">
+    <div className="flex items-center justify-between gap-6 bg-sl-surface border border-sl-border px-6 py-5 transition-colors duration-200 hover:border-[rgba(232,69,48,0.3)]">
       <div className="flex items-center gap-5">
-        {/* Art thumbnail */}
+        {/* Art thumbnail — handle filename vs emoji */}
         <div
-          className="w-16 h-16 flex-shrink-0 flex items-center justify-center text-2xl border border-sl-border"
+          className="relative w-16 h-16 flex-shrink-0 border border-sl-border overflow-hidden"
           style={{ background: game?.artGradient ?? '#141414' }}
           aria-hidden="true"
         >
-          {game?.icon ?? '🎮'}
+          {game && isIconFile(game.icon) ? (
+            <Image
+              src={`/${game.icon}`}
+              alt={game.title}
+              fill
+              sizes="64px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-2xl">
+              {game?.icon ?? '🎮'}
+            </div>
+          )}
         </div>
 
         <div>
@@ -208,14 +208,9 @@ function LibraryCard({ entry, isDLC = false }: { entry: LibraryEntry; isDLC?: bo
         {entry.downloadUrl ? (
           <a
             href={entry.downloadUrl}
-            className="inline-flex items-center gap-1.5 bg-sl-cyan text-sl-darker
-                       px-4 py-2 font-mono text-[9px] tracking-[0.1em] uppercase
-                       no-underline clip-btn-sm transition-colors duration-200 hover:bg-[#26a0ae]"
+            className="inline-flex items-center gap-1.5 bg-sl-cyan text-sl-darker px-4 py-2 font-mono text-[9px] tracking-[0.1em] uppercase no-underline clip-btn-sm transition-colors duration-200 hover:bg-[#26a0ae]"
           >
-            <svg width="10" height="10" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path d="M7 1v8M4 6l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M2 11h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <DownloadIcon />
             Download
           </a>
         ) : (
@@ -227,9 +222,7 @@ function LibraryCard({ entry, isDLC = false }: { entry: LibraryEntry; isDLC?: bo
         {!isDLC && game && (
           <Link
             href={`/games/${game.id}`}
-            className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted
-                       border border-sl-border px-3 py-2 no-underline
-                       hover:border-sl-mid hover:text-sl-white transition-colors duration-200"
+            className="font-mono text-[9px] tracking-[0.1em] uppercase text-sl-muted border border-sl-border px-3 py-2 no-underline hover:border-sl-mid hover:text-sl-white transition-colors duration-200"
           >
             Details
           </Link>
@@ -250,12 +243,19 @@ function EmptyLibrary() {
       </p>
       <Link
         href="/games"
-        className="inline-flex items-center gap-2 bg-sl-orange text-sl-white
-                   px-6 py-3 font-mono text-[10px] tracking-[0.12em] uppercase
-                   no-underline clip-btn transition-colors duration-200 hover:bg-[#c93a28]"
+        className="inline-flex items-center gap-2 bg-sl-orange text-sl-white px-6 py-3 font-mono text-[10px] tracking-[0.12em] uppercase no-underline clip-btn transition-colors duration-200 hover:bg-[#c93a28]"
       >
         Browse Games →
       </Link>
     </div>
+  )
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M7 1v8M4 6l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2 11h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
   )
 }

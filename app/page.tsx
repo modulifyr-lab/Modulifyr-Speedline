@@ -14,8 +14,15 @@ import Link         from 'next/link'
 import { games }    from '@/lib/games'
 
 export default function Home() {
-  const featured  = games.find(g => g.featured) ?? games[0]
-  const secondary = games.filter(g => !g.featured).slice(0, 2)
+  const featured   = games.find(g => g.featured) ?? games[0]
+  const secondary  = games.filter(g => !g.featured).slice(0, 2)
+  const total      = games.length
+
+  // Grid cols: 1 game = full width, 2 games = 2 col, 3+ games = 3 col with featured spanning 2
+  const gridClass =
+    total === 1 ? 'grid-cols-1' :
+    total === 2 ? 'grid-cols-1 sm:grid-cols-2' :
+    'grid-cols-3'
 
   return (
     <>
@@ -47,8 +54,8 @@ export default function Home() {
           </Reveal>
 
           <Reveal delay={80}>
-            <div className="grid grid-cols-3 gap-0.5">
-              <GameCard game={featured}      featured={true} />
+            <div className={`grid ${gridClass} gap-0.5`}>
+              <GameCard game={featured} featured={total >= 3} />
               {secondary.map(g => (
                 <GameCard key={g.id} game={g} />
               ))}
@@ -59,9 +66,7 @@ export default function Home() {
             <div className="mt-8 flex justify-center">
               <Link
                 href="/games"
-                className="inline-flex items-center gap-2.5 border border-sl-border
-                           px-7 py-3 font-mono text-[10px] tracking-[0.12em] uppercase
-                           no-underline transition-colors duration-200"
+                className="inline-flex items-center gap-2.5 border border-sl-border px-7 py-3 font-mono text-[10px] tracking-[0.12em] uppercase no-underline transition-colors duration-200"
                 style={{ color: 'var(--color-text-muted)' }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text)';

@@ -4,14 +4,15 @@ import { doc, setDoc, Timestamp }    from 'firebase/firestore'
 
 export async function POST(req: NextRequest) {
   try {
-    const { gameId, uid, email } = await req.json() as {
-      gameId: string
-      uid:    string
-      email:  string
-    }
+    const body = await req.json() as Record<string, unknown>
+    const { gameId, uid, email } = body
 
-    if (!gameId || !uid || !email) {
-      return NextResponse.json({ error: 'Missing fields.' }, { status: 400 })
+    if (
+      typeof gameId !== 'string' || !gameId.trim() ||
+      typeof uid    !== 'string' || !uid.trim()    ||
+      typeof email  !== 'string' || !email.includes('@')
+    ) {
+      return NextResponse.json({ error: 'Missing or invalid fields.' }, { status: 400 })
     }
 
     const db  = await getServerDb()
@@ -19,7 +20,8 @@ export async function POST(req: NextRequest) {
 
     await setDoc(ref, {
       uid,
-      email,
+      email:        email.toLowerCase().trim(),
+      gameId,
       subscribedAt: Timestamp.now(),
     })
 

@@ -2,7 +2,8 @@
 
 import { useState }  from 'react'
 import Link          from 'next/link'
-import { Game, GameStatus, PLATFORM_LABELS, STATUS_LABELS } from '@/lib/games'
+import Image         from 'next/image'
+import { Game, GameStatus, PLATFORM_LABELS, STATUS_LABELS, isIconFile } from '@/lib/games'
 
 const STATUS_BADGE: Record<GameStatus, string> = {
   'available':      'badge-avail',
@@ -30,17 +31,34 @@ const CheckIcon = () => (
   </svg>
 )
 
+interface NotifyState {
+  loading: boolean
+  done:    boolean
+}
+
 interface GameCardProps {
   game:      Game
   featured?: boolean
 }
 
 export default function GameCard({ game, featured = false }: GameCardProps) {
-  const [notified, setNotified] = useState(false)
+  const [notify, setNotify] = useState<NotifyState>({ loading: false, done: false })
 
   const canBuy   = game.status === 'available' && game.directUrl
   const canSteam = game.steamUrl !== null
   const showPrice = game.status === 'available' && game.price !== null
+
+  async function handleNotify() {
+    // Fire and forget — user feedback is immediate
+    setNotify({ loading: true, done: false })
+    try {
+      // We don't have user uid/email here without auth context; open notify modal instead.
+      // For now, navigate to game detail page where user can sign in and subscribe.
+      window.location.href = `/games/${game.id}#notify`
+    } finally {
+      setNotify({ loading: false, done: true })
+    }
+  }
 
   return (
     <article
@@ -53,7 +71,7 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
       `}
       style={{ backgroundColor: 'var(--color-surface)' }}
     >
-      {/* Art area — clicking this navigates to the detail page */}
+      {/* Art area */}
       <Link
         href={`/games/${game.id}`}
         className="block no-underline"
@@ -64,12 +82,20 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
           style={{ background: game.artGradient }}
         >
           <div className="absolute inset-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`/${game.icon}`}
-              alt={`${game.title} cover art`}
-              className="w-full h-full object-cover"
-            />
+            {isIconFile(game.icon) ? (
+              <Image
+                src={`/${game.icon}`}
+                alt={`${game.title} cover art`}
+                fill
+                sizes={featured ? '(max-width: 768px) 100vw, 66vw' : '(max-width: 768px) 100vw, 33vw'}
+                className="object-cover"
+                priority={featured}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-6xl select-none">
+                {game.icon}
+              </div>
+            )}
           </div>
 
           {/* Status badge */}
@@ -82,9 +108,7 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
             {game.platforms.map(p => (
               <span
                 key={p}
-                className="font-mono text-[9px] tracking-[0.08em] uppercase
-                           border border-sl-border px-2 py-0.5
-                           backdrop-blur-sm"
+                className="font-mono text-[9px] tracking-[0.08em] uppercase border border-sl-border px-2 py-0.5 backdrop-blur-sm"
                 style={{ color: 'var(--color-text-secondary)', backgroundColor: 'rgba(var(--color-bg-rgb), 0.7)' }}
               >
                 {PLATFORM_LABELS[p]}
@@ -92,7 +116,7 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
             ))}
           </div>
 
-          {/* Hover overlay hint */}
+          {/* Hover overlay */}
           <div className="absolute inset-0 bg-[rgba(232,69,48,0.04)] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
         </div>
       </Link>
@@ -103,7 +127,6 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
           {game.genre} · {game.engine}
         </p>
 
-        {/* Title links to detail page */}
         <Link href={`/games/${game.id}`} className="no-underline group/title">
           <h3 className={`font-syne font-bold leading-tight mb-2 group-hover/title:text-sl-orange transition-colors duration-200 ${featured ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'}`} style={{ color: 'var(--color-text)' }}>
             {game.title}
@@ -130,9 +153,7 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
             {canBuy && (
               <a
                 href={game.directUrl!}
-                className="inline-flex items-center gap-1.5 bg-sl-orange text-sl-white
-                           px-3.5 py-2 font-mono text-[9px] tracking-[0.1em] uppercase
-                           no-underline clip-btn-sm transition-colors duration-200 hover:bg-[#c93a28]"
+                className="inline-flex items-center gap-1.5 bg-sl-orange text-sl-white px-3.5 py-2 font-mono text-[9px] tracking-[0.1em] uppercase no-underline clip-btn-sm transition-colors duration-200 hover:bg-[#c93a28]"
               >
                 Buy Direct
               </a>
@@ -143,9 +164,7 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
                 href={game.steamUrl!}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 border border-sl-border
-                           px-3 py-2 font-mono text-[9px] tracking-[0.1em] uppercase
-                           no-underline transition-colors duration-200 hover:border-sl-mid"
+                className="inline-flex items-center gap-1.5 border border-sl-border px-3 py-2 font-mono text-[9px] tracking-[0.1em] uppercase no-underline transition-colors duration-200 hover:border-sl-mid"
                 style={{ backgroundColor: 'var(--color-surface2)', color: 'var(--color-text-secondary)' }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-secondary)')}
@@ -157,20 +176,20 @@ export default function GameCard({ game, featured = false }: GameCardProps) {
 
             {!canBuy && (
               <button
-                onClick={() => setNotified(true)}
-                disabled={notified}
+                onClick={handleNotify}
+                disabled={notify.loading || notify.done}
                 className={`
                   inline-flex items-center gap-1.5 px-3.5 py-2
                   font-mono text-[9px] tracking-[0.1em] uppercase
                   border transition-colors duration-200 cursor-pointer
-                  ${notified
+                  ${notify.done
                     ? 'border-sl-green text-sl-green cursor-default'
                     : 'border-sl-border hover:border-sl-orange hover:text-sl-orange'}
                 `}
-                style={{ color: notified ? undefined : 'var(--color-text-muted)' }}
+                style={{ color: notify.done ? undefined : 'var(--color-text-muted)' }}
               >
-                {notified ? <CheckIcon /> : <BellIcon />}
-                {notified ? 'On the List' : 'Notify Me'}
+                {notify.done ? <CheckIcon /> : <BellIcon />}
+                {notify.done ? 'On the List' : notify.loading ? '...' : 'Notify Me'}
               </button>
             )}
           </div>
